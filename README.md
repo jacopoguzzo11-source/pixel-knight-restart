@@ -1,2 +1,0 @@
-# pixel-knight-restart
-aura
