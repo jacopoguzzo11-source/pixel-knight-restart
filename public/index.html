@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v1</title>
+<title>Pixel Knight RESTART v2</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -81,6 +81,67 @@ input{width:100%;background:#0d0e0f;border:1px solid #565348;color:white;border-
  #score{font-size:16px;top:10px}
 }
 
+
+
+/* ===== Fantasy Menu v2 ===== */
+#menu{--mx:50%;--my:32%;background:
+ radial-gradient(circle at var(--mx) var(--my), rgba(255,210,120,.36) 0%, rgba(255,181,71,.16) 14%, rgba(0,0,0,0) 34%),
+ linear-gradient(180deg, rgba(10,11,16,.72) 0%, rgba(4,5,9,.92) 100%);
+overflow:hidden}
+#menu:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.95;
+ background:
+ linear-gradient(to top, rgba(8,9,11,.96) 0 18%, rgba(8,9,11,.72) 25%, rgba(8,9,11,.18) 52%, rgba(8,9,11,.82) 100%),
+ radial-gradient(circle at 14% 16%, rgba(255,150,40,.08), transparent 18%),
+ radial-gradient(circle at 86% 18%, rgba(255,150,40,.08), transparent 18%),
+ linear-gradient(180deg, rgba(87,92,129,.18), rgba(21,23,33,.04));}
+#menu:after{content:"";position:absolute;left:-2%;right:-2%;bottom:0;height:44%;pointer-events:none;opacity:.9;
+ background:
+ radial-gradient(circle at 14% 86%, rgba(255,170,70,.26) 0 1.6%, transparent 2%),
+ radial-gradient(circle at 86% 86%, rgba(255,170,70,.26) 0 1.6%, transparent 2%),
+ linear-gradient(to top, rgba(0,0,0,.78), transparent 48%),
+ linear-gradient(110deg, transparent 0 11%, rgba(8,8,10,.84) 11% 17%, transparent 17% 24%, rgba(8,8,10,.86) 24% 31%, transparent 31% 69%, rgba(8,8,10,.86) 69% 76%, transparent 76% 83%, rgba(8,8,10,.84) 83% 89%, transparent 89% 100%),
+ linear-gradient(to top, #11151c 0 5%, transparent 5% 100%);
+ filter:blur(.2px)}
+#menu .menuModal{position:relative;width:min(1140px,96vw);padding:0;border-radius:22px;border:1px solid rgba(196,170,96,.35);overflow:hidden;background:rgba(8,9,12,.72);box-shadow:0 35px 90px rgba(0,0,0,.62), inset 0 0 0 1px rgba(255,220,150,.05);backdrop-filter:blur(8px)}
+#menu .menuPanel{position:relative;padding:26px 24px 24px 24px;background:linear-gradient(180deg, rgba(16,18,24,.82), rgba(10,11,14,.90))}
+#menu .menuHero{position:relative;padding:34px 28px 28px 28px;border-bottom:1px solid rgba(212,176,91,.18);background:
+ linear-gradient(180deg, rgba(58,60,92,.36) 0%, rgba(24,25,35,.16) 46%, rgba(12,13,17,.20) 100%),
+ radial-gradient(circle at 50% 5%, rgba(255,226,169,.22), transparent 26%),
+ linear-gradient(180deg, rgba(8,9,13,.22), rgba(8,9,13,.55));}
+#menu .menuHero:after{content:"";position:absolute;left:0;right:0;bottom:0;height:54%;pointer-events:none;opacity:.92;
+ background:
+ linear-gradient(to top, rgba(7,8,11,.95), rgba(7,8,11,.26) 34%, transparent 58%),
+ linear-gradient(90deg, transparent 0 9%, rgba(15,17,20,.96) 9% 18%, transparent 18% 24%, rgba(15,17,20,.96) 24% 31%, transparent 31% 69%, rgba(15,17,20,.96) 69% 76%, transparent 76% 82%, rgba(15,17,20,.96) 82% 91%, transparent 91% 100%),
+ radial-gradient(circle at 50% 72%, rgba(255,178,74,.14), transparent 19%)}
+#menu .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid rgba(227,195,112,.34);border-radius:999px;background:rgba(16,18,22,.54);color:#e8c97f;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;position:relative;z-index:1}
+#menu .heroTitle{position:relative;z-index:1;font-size:clamp(34px,4.8vw,64px);line-height:.95;margin:16px 0 10px 0;font-weight:1000;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 4px 18px rgba(0,0,0,.55)}
+#menu .heroTitle span{display:block;font-size:clamp(16px,2vw,24px);letter-spacing:.28em;color:#f0dca3;margin-top:12px}
+#menu .heroText{position:relative;z-index:1;max-width:720px;color:#d4ccbd;font-size:15px;line-height:1.65;margin:0}
+#menu .heroHint{position:relative;z-index:1;margin-top:14px;color:#aaabaf;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+#menu .menuMainGrid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:18px}
+#menu .menuColumn{display:grid;gap:16px}
+#menu .modeCard{position:relative;overflow:hidden;border-radius:18px;padding:18px;border:1px solid rgba(193,171,111,.22);background:linear-gradient(180deg, rgba(27,30,35,.92), rgba(14,16,19,.95));box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+#menu .modeCard:before{content:"";position:absolute;inset:-1px auto auto -1px;width:140px;height:140px;background:radial-gradient(circle, rgba(255,182,72,.13), transparent 70%);pointer-events:none}
+#menu .modeCard:hover{transform:translateY(-2px);border-color:rgba(229,197,118,.54);box-shadow:0 14px 34px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,243,206,.04)}
+#menu .modeCard h3{margin:0 0 8px 0;font-size:20px}
+#menu .modeCard p{margin:0;color:#b7b0a2;line-height:1.5}
+#menu .modeDesc{font-size:13px;margin-bottom:12px !important}
+#menu .line{height:1px;background:linear-gradient(90deg, transparent, rgba(223,191,110,.28), transparent);margin:12px 0}
+#menu .formatTitle,#menu .subLabel{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#d8b96a;font-weight:900;margin-bottom:8px}
+#menu .botBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#menu .menuPanel input{background:rgba(7,8,9,.78);border:1px solid rgba(114,105,77,.8);min-height:46px;border-radius:12px;padding:12px 14px;color:#f6eedc}
+#menu .menuPanel input::placeholder{color:#8f8b82}
+#menu .menuPanel button{min-height:44px;border-radius:12px;border-color:#706750;background:#202327}
+#menu .menuPanel button.primary{background:linear-gradient(180deg, #435c43, #2d3e2d);border-color:#768a70}
+#menu .menuPanel button.selected{background:linear-gradient(180deg, #604921, #443115)}
+#menu .small{color:#9c988f}
+#menu .publicCard,#menu .botCard{min-height:100%}
+#menu .menuFooter{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-top:18px;padding:14px 2px 0 2px;border-top:1px solid rgba(193,171,111,.18)}
+#menu .footerNote{color:#8e897d;font-size:12px;line-height:1.55}
+#menu #menuError{min-height:18px;color:#ff9d84;font-weight:700;margin:0}
+@media (max-width:900px){#menu .menuMainGrid{grid-template-columns:1fr}#menu .heroText{max-width:none}#menu .menuHero{padding:28px 20px 24px 20px}#menu .menuPanel{padding:20px}}
+@media (max-width:650px){#menu .botBtns{grid-template-columns:1fr}#menu .heroHint{font-size:11px;line-height:1.5}#menu .menuFooter{flex-direction:column;align-items:flex-start}}
+
 </style>
 </head>
 <body>
@@ -133,49 +194,73 @@ input{width:100%;background:#0d0e0f;border:1px solid #565348;color:white;border-
 </div>
 
 <div class="overlay show" id="menu">
- <div class="modal">
-  <h1>⚔ Pixel Knight RESTART v1</h1>
-  <p>Puoi giocare contro un amico, allenarti contro un bot oppure cercare automaticamente un avversario online.</p>
-  <div class="grid2">
-   <div class="lobbybox">
-    <h3>👥 Stanza privata</h3>
-    <input id="createName" maxlength="18" placeholder="Il tuo nome"/>
-    <div style="height:8px"></div>
-    <div class="botBtns">
-      <button class="primary" data-private-format="1v1">1 contro 1</button>
-      <button class="primary" data-private-format="1v1v1">1v1v1</button>
-      <button class="primary" data-private-format="2v2">2 contro 2</button>
-    </div>
-   </div>
-   <div class="lobbybox">
-    <h3>🔗 Entra con codice</h3>
-    <input id="joinName" maxlength="18" placeholder="Il tuo nome"/>
-    <div style="height:7px"></div><input id="joinCode" maxlength="6" placeholder="CODICE"/>
-    <div style="height:8px"></div><button class="primary" id="joinBtn">Entra nel duello</button>
-   </div>
+ <div class="modal menuModal">
+  <div class="menuHero">
+   <div class="eyebrow">⚔ Fantasy Arena • Menu v2</div>
+   <h1 class="heroTitle">Pixel Knight <span>Restart</span></h1>
+   <p class="heroText">Entra nella fortezza, prepara il tuo cavaliere e scegli come combattere: stanza privata, bot di allenamento o partita pubblica. Il menu ora ha uno stile più fantasy e una luce dinamica che segue la freccia come una torcia.</p>
+   <div class="heroHint">Muovi il cursore sul menu: il punto illuminato segue la freccia.</div>
   </div>
-  <div class="lobbybox" style="margin-top:10px">
-    <h3>🤖 Gioca contro un bot</h3>
-    <input id="botName" maxlength="18" placeholder="Il tuo nome"/>
-    <div class="botBtns" style="margin-top:8px">
-      <button data-bot="easy">Facile</button>
-      <button data-bot="medium">Medio</button>
-      <button data-bot="hard">Difficile</button>
-    </div>
-    <p class="small">Facile è lento e non para. Medio è più aggressivo. Difficile si muove meglio e usa anche lo scudo.</p>
-  </div>
+  <div class="menuPanel">
+   <div class="menuMainGrid">
+    <div class="menuColumn">
+     <div class="modeCard">
+      <h3>👥 Stanza privata</h3>
+      <p class="modeDesc">Crea una lobby e scegli il formato del duello prima di invitare gli amici.</p>
+      <input id="createName" maxlength="18" placeholder="Il tuo nome"/>
+      <div class="line"></div>
+      <div class="formatTitle">Formato partita</div>
+      <div class="botBtns">
+       <button class="primary" data-private-format="1v1">1 contro 1</button>
+       <button class="primary" data-private-format="1v1v1">1v1v1</button>
+       <button class="primary" data-private-format="2v2">2 contro 2</button>
+      </div>
+     </div>
 
-  <div class="lobbybox" style="margin-top:10px">
-    <h3>🌐 Gioca pubblico</h3>
-    <input id="publicName" maxlength="18" placeholder="Il tuo nome"/>
-    <div style="height:8px"></div>
-    <button class="primary" id="publicBtn">Cerca un avversario online</button>
-    <p class="small">Ti abbina a un altro giocatore che, nello stesso momento, sta cercando una partita pubblica su questo gioco.</p>
+     <div class="modeCard">
+      <h3>🔗 Entra con codice</h3>
+      <p class="modeDesc">Hai già un codice stanza? Inseriscilo qui per entrare subito nel duello.</p>
+      <input id="joinName" maxlength="18" placeholder="Il tuo nome"/>
+      <div style="height:8px"></div>
+      <input id="joinCode" maxlength="6" placeholder="Codice stanza"/>
+      <div style="height:10px"></div>
+      <button class="primary" id="joinBtn">Entra nel duello</button>
+     </div>
+    </div>
+
+    <div class="menuColumn">
+     <div class="modeCard botCard">
+      <h3>🤖 Allenamento contro bot</h3>
+      <p class="modeDesc">Perfetto per provare comandi, armi e mappe senza aspettare altri giocatori.</p>
+      <input id="botName" maxlength="18" placeholder="Il tuo nome"/>
+      <div class="line"></div>
+      <div class="subLabel">Scegli la difficoltà</div>
+      <div class="botBtns">
+       <button data-bot="easy">Facile</button>
+       <button data-bot="medium">Medio</button>
+       <button data-bot="hard">Difficile</button>
+      </div>
+      <p class="small" style="margin-top:10px">Facile è lento e non para. Medio è più aggressivo. Difficile si muove meglio e usa anche lo scudo.</p>
+     </div>
+
+     <div class="modeCard publicCard">
+      <h3>🌐 Gioca pubblico</h3>
+      <p class="modeDesc">Cerca automaticamente un altro giocatore online che sta cercando una partita nello stesso momento.</p>
+      <input id="publicName" maxlength="18" placeholder="Il tuo nome"/>
+      <div style="height:10px"></div>
+      <button class="primary" id="publicBtn">Cerca un avversario online</button>
+      <p class="small" style="margin-top:10px">La ricerca prova ad abbinarti con un altro giocatore con questo stesso gioco aperto.</p>
+     </div>
+    </div>
+   </div>
+
+   <div class="menuFooter">
+    <div class="footerNote">Menu rinnovato con stile castello fantasy, atmosfera più avventurosa e selezione più leggibile. L'arena è stata ritoccata visivamente senza toccare il cuore del gameplay.</div>
+    <p class="small" id="menuError"></p>
+   </div>
   </div>
-  <p class="small" id="menuError"></p>
  </div>
 </div>
-
 
 <div class="overlay" id="matchmaking">
  <div class="modal" style="max-width:520px;text-align:center">
@@ -235,6 +320,18 @@ const ui={
  damage:document.getElementById("damage"),cross:document.getElementById("cross"),damageNumbers:document.getElementById("damageNumbers")
 };
 
+const setMenuTorch=(clientX,clientY)=>{
+ const rect=menu.getBoundingClientRect();
+ if(!rect.width||!rect.height)return;
+ const x=((clientX-rect.left)/rect.width)*100;
+ const y=((clientY-rect.top)/rect.height)*100;
+ menu.style.setProperty("--mx",`${Math.max(0,Math.min(100,x)).toFixed(1)}%`);
+ menu.style.setProperty("--my",`${Math.max(0,Math.min(100,y)).toFixed(1)}%`);
+};
+menu.addEventListener("pointermove",e=>setMenuTorch(e.clientX,e.clientY));
+menu.addEventListener("pointerdown",e=>setMenuTorch(e.clientX,e.clientY));
+menu.addEventListener("pointerleave",()=>{menu.style.setProperty("--mx","50%");menu.style.setProperty("--my","32%");});
+
 const MAP_INFO={
  keep:{name:"Fortezza di Pietra",arena:16,obstacles:[{x:0,z:0,r:1.65}]},
  forest:{name:"Rovine della Foresta",arena:18,obstacles:[{x:-5.5,z:-4,r:.95},{x:5,z:4.5,r:.95},{x:-4,z:6.2,r:.85},{x:6,z:-5.5,r:.85}]},
@@ -289,14 +386,16 @@ function torch(x,z){const l=new THREE.PointLight(0xff7735,2.0,7,2);l.position.se
 function buildArena(id){
  if(currentMap===id)return;currentMap=id;clearGroup(arenaGroup);const m=MAP_INFO[id]||MAP_INFO.keep;
  if(id==="keep"){
-  scene.background=new THREE.Color(0x7f8d9a);scene.fog=new THREE.FogExp2(0x89939c,.018);
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(34,34),new THREE.MeshStandardMaterial({color:0x6f6d67,roughness:.96}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;arenaGroup.add(ground);
-  for(const [x,z,w,d] of [[0,-17,34,1],[0,17,34,1],[-17,0,1,34],[17,0,1,34]])box(w,5,d,0x676761,x,2.5,z);
+  scene.background=new THREE.Color(0x545d78);scene.fog=new THREE.FogExp2(0x5b6278,.022);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(34,34),new THREE.MeshStandardMaterial({color:0x615e5a,roughness:.96}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;arenaGroup.add(ground);
+  for(const [x,z,w,d] of [[0,-17,34,1],[0,17,34,1],[-17,0,1,34],[17,0,1,34]])box(w,5,d,0x57565d,x,2.5,z);
   for(const [x,z] of [[-16,-16],[16,-16],[-16,16],[16,16]])pillar(x,z);
   const well=new THREE.Mesh(new THREE.CylinderGeometry(1.65,1.65,1.3,18),new THREE.MeshStandardMaterial({color:0x575751,roughness:.9}));well.position.set(0,.65,0);well.castShadow=well.receiveShadow=true;arenaGroup.add(well);
-  [[-11,-11],[11,-11],[-11,11],[11,11]].forEach(p=>torch(...p));
+  [[-11,-11],[11,-11],[-11,11],[11,11],[-15.5,0],[15.5,0]].forEach(p=>torch(...p));
+  box(.22,2.6,1.1,0x6a1f23,-16.25,2.6,0);
+  box(.22,2.6,1.1,0x22496c,16.25,2.6,0);
  }else if(id==="forest"){
-  scene.background=new THREE.Color(0x647a69);scene.fog=new THREE.FogExp2(0x637768,.024);
+  scene.background=new THREE.Color(0x425264);scene.fog=new THREE.FogExp2(0x4f5d68,.028);
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(38,38),new THREE.MeshStandardMaterial({color:0x405d3d,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;arenaGroup.add(ground);
   for(const [x,z] of [[-5.5,-4],[5,4.5],[-4,6.2],[6,-5.5]])pillar(x,z,0x79766a);
   for(let i=0;i<26;i++){const a=i/26*Math.PI*2,r=17+Math.sin(i*4)*.8,x=Math.cos(a)*r,z=Math.sin(a)*r;box(.55,3.4,.55,0x49351f,x,1.7,z);const crown=new THREE.Mesh(new THREE.SphereGeometry(1.3,9,7),new THREE.MeshStandardMaterial({color:0x315437,roughness:1}));crown.position.set(x,3.7,z);crown.castShadow=true;arenaGroup.add(crown)}
