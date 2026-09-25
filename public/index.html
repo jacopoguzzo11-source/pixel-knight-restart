@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v2.1</title>
+<title>Pixel Knight RESTART v2.3</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -150,6 +150,141 @@ overflow:hidden}
 @media (max-width:900px){#menu .menuMainGrid{grid-template-columns:1fr}#menu .heroText{max-width:none}#menu .menuHero{padding:28px 20px 24px 20px}#menu .menuPanel{padding:20px}}
 @media (max-width:650px){#menu .botBtns{grid-template-columns:1fr}#menu .heroHint{font-size:11px;line-height:1.5}#menu .menuFooter{flex-direction:column;align-items:flex-start}}
 
+
+/* ===== v2.3 FINAL: scroll affidabile + torcia forte + fantasy polish ===== */
+#menu{
+  overflow-y:scroll !important;
+  overflow-x:hidden !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  padding:18px 14px 70px !important;
+  touch-action:pan-y !important;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:#c59a4d #0e1014;
+}
+#menu::-webkit-scrollbar{width:12px}
+#menu::-webkit-scrollbar-track{background:#0e1014}
+#menu::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#d3ad62,#795426);
+  border:3px solid #0e1014;
+  border-radius:999px
+}
+#menu .menuModal{
+  width:min(1140px,96vw) !important;
+  max-height:none !important;
+  height:auto !important;
+  min-height:max-content !important;
+  overflow:visible !important;
+  margin:4px auto 28px !important;
+  isolation:isolate;
+}
+#menu .menuHero,#menu .menuPanel{
+  position:relative;
+  z-index:2;
+}
+
+/* Torcia DAVANTI ai pannelli: illumina davvero pulsanti, testi e schede. */
+#menu .menuModal::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:40;
+  pointer-events:none;
+  border-radius:22px;
+  background:
+    radial-gradient(circle 220px at var(--mx,50%) var(--my,30%),
+      rgba(255,250,216,.62) 0%,
+      rgba(255,220,137,.40) 24%,
+      rgba(255,177,67,.19) 48%,
+      transparent 74%),
+    radial-gradient(circle 85px at var(--mx,50%) var(--my,30%),
+      rgba(255,255,238,.30),
+      transparent 78%);
+  mix-blend-mode:screen;
+  opacity:1;
+}
+
+/* Più atmosfera fantasy */
+#menu .menuHero{
+  background:
+    radial-gradient(circle at 50% -10%,rgba(255,219,139,.25),transparent 40%),
+    linear-gradient(180deg,rgba(56,62,91,.78),rgba(18,20,28,.55) 58%,rgba(8,9,13,.84)) !important;
+}
+#menu .menuPanel{
+  background:
+    linear-gradient(180deg,rgba(16,18,24,.91),rgba(7,8,11,.97)) !important;
+}
+#menu .modeCard{
+  background:
+    linear-gradient(145deg,rgba(34,38,46,.97),rgba(12,14,18,.98)) !important;
+  border-color:rgba(218,186,108,.34) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 12px 30px rgba(0,0,0,.25) !important;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+#menu .modeCard:hover{
+  transform:translateY(-3px) scale(1.006);
+  border-color:rgba(252,216,127,.82) !important;
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.42),
+    0 0 34px rgba(255,178,58,.22),
+    inset 0 0 0 1px rgba(255,246,214,.06) !important;
+}
+#menu .menuPanel button{
+  transition:transform .14s ease,filter .14s ease,box-shadow .14s ease;
+}
+#menu .menuPanel button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.16);
+  box-shadow:0 0 24px rgba(255,190,75,.17);
+}
+#menu .heroTitle{
+  text-shadow:0 5px 18px #000,0 0 35px rgba(230,180,78,.24);
+  animation:fantasyTitleGlow 4s ease-in-out infinite;
+}
+@keyframes fantasyTitleGlow{
+  50%{text-shadow:0 5px 18px #000,0 0 52px rgba(242,192,90,.40)}
+}
+
+/* Messaggio che rende evidente che il menu scorre */
+#menu .menuScrollHint{
+  position:sticky;
+  bottom:10px;
+  z-index:70;
+  width:max-content;
+  max-width:calc(100vw - 36px);
+  margin:16px auto 0;
+  padding:8px 14px;
+  border:1px solid rgba(224,190,104,.42);
+  border-radius:999px;
+  background:rgba(8,9,12,.82);
+  backdrop-filter:blur(7px);
+  color:#e1c98f;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  pointer-events:none;
+  box-shadow:0 10px 26px rgba(0,0,0,.35);
+}
+
+@media(max-width:700px){
+  #menu{padding:8px 7px 56px !important}
+  #menu .menuModal{width:100% !important;margin:0 auto 24px !important}
+  #menu .menuHero{padding:24px 16px 20px !important}
+  #menu .menuPanel{padding:14px 12px 26px !important}
+  #menu .menuModal::after{
+    background:
+      radial-gradient(circle 150px at var(--mx,50%) var(--my,24%),
+        rgba(255,244,202,.56),
+        rgba(255,192,78,.25) 38%,
+        transparent 74%);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -204,7 +339,7 @@ overflow:hidden}
 <div class="overlay show" id="menu">
  <div class="modal menuModal">
   <div class="menuHero">
-   <div class="eyebrow">⚔ Fantasy Arena • Menu v2.1</div>
+   <div class="eyebrow">⚔ Fantasy Arena • Menu v2.3.1</div>
    <h1 class="heroTitle">Pixel Knight <span>Restart</span></h1>
    <p class="heroText">Entra nella fortezza, prepara il tuo cavaliere e scegli come combattere: stanza privata, bot di allenamento o partita pubblica. Il menu ora ha uno stile più fantasy e una luce dinamica che segue la freccia come una torcia.</p>
    <div class="heroHint">Muovi il cursore sul menu: il punto illuminato segue la freccia.</div>
@@ -266,6 +401,7 @@ overflow:hidden}
     <div class="footerNote">Menu rinnovato con stile castello fantasy, atmosfera più avventurosa e selezione più leggibile. L'arena è stata ritoccata visivamente senza toccare il cuore del gameplay.</div>
     <p class="small" id="menuError"></p>
    </div>
+   <div class="menuScrollHint">↕ Scorri per vedere tutte le modalità</div>
   </div>
  </div>
 </div>
@@ -330,26 +466,22 @@ const ui={
 
 const menuModal=document.querySelector("#menu .menuModal");
 const setMenuTorch=(clientX,clientY)=>{
- const rect=menu.getBoundingClientRect();
- if(rect.width&&rect.height){
-  const x=((clientX-rect.left)/rect.width)*100;
-  const y=((clientY-rect.top)/rect.height)*100;
-  menu.style.setProperty("--mx",`${Math.max(0,Math.min(100,x)).toFixed(1)}%`);
-  menu.style.setProperty("--my",`${Math.max(0,Math.min(100,y)).toFixed(1)}%`);
- }
- if(menuModal){
-  const mr=menuModal.getBoundingClientRect();
-  if(mr.width&&mr.height){
-   const mx=((clientX-mr.left)/mr.width)*100;
-   const my=((clientY-mr.top)/mr.height)*100;
-   menuModal.style.setProperty("--mx",`${Math.max(0,Math.min(100,mx)).toFixed(1)}%`);
-   menuModal.style.setProperty("--my",`${Math.max(0,Math.min(100,my)).toFixed(1)}%`);
-  }
- }
+ if(!menuModal)return;
+ const r=menuModal.getBoundingClientRect();
+ if(!r.width||!r.height)return;
+ const x=((clientX-r.left)/r.width)*100;
+ const y=((clientY-r.top)/r.height)*100;
+ menuModal.style.setProperty("--mx",`${Math.max(0,Math.min(100,x)).toFixed(1)}%`);
+ menuModal.style.setProperty("--my",`${Math.max(0,Math.min(100,y)).toFixed(1)}%`);
 };
-menu.addEventListener("pointermove",e=>setMenuTorch(e.clientX,e.clientY));
-menu.addEventListener("pointerdown",e=>setMenuTorch(e.clientX,e.clientY));
-menu.addEventListener("pointerleave",()=>{menu.style.setProperty("--mx","50%");menu.style.setProperty("--my","32%");});
+menu.addEventListener("pointermove",e=>setMenuTorch(e.clientX,e.clientY),{passive:true});
+menu.addEventListener("pointerdown",e=>setMenuTorch(e.clientX,e.clientY),{passive:true});
+menu.addEventListener("pointerleave",()=>{
+ if(menuModal){
+  menuModal.style.setProperty("--mx","50%");
+  menuModal.style.setProperty("--my","30%");
+ }
+});
 
 const MAP_INFO={
  keep:{name:"Fortezza di Pietra",arena:16,obstacles:[{x:0,z:0,r:1.65}]},
