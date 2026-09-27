@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v2.7</title>
+<title>Pixel Knight RESTART v2.8</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -288,7 +288,6 @@ overflow:hidden}
 
 /* ===== v2.5 HUB A CARTE - FANTASY ELEGANTE ===== */
 #menu{
-  display:flex !important;
   align-items:flex-start !important;
   justify-content:center !important;
   overflow-y:auto !important;
@@ -1029,6 +1028,18 @@ overflow:hidden}
   pointer-events:none;
 }
 #arenaEntryHint.show{display:block}
+
+
+/* ===== v2.8 FIX OVERLAY MENU =====
+   Il menu principale è visibile SOLO quando ha la classe .show.
+   Questo evita che, dopo "Pronto", ricompaia sopra l'arena.
+*/
+#menu:not(.show){
+  display:none !important;
+}
+#menu.show{
+  display:flex !important;
+}
 
 </style>
 </head>
