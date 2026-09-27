@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v2.3</title>
+<title>Pixel Knight RESTART v2.4</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -339,7 +339,7 @@ overflow:hidden}
 <div class="overlay show" id="menu">
  <div class="modal menuModal">
   <div class="menuHero">
-   <div class="eyebrow">⚔ Fantasy Arena • Menu v2.3.1</div>
+   <div class="eyebrow">⚔ Fantasy Arena • Menu v2.4.1</div>
    <h1 class="heroTitle">Pixel Knight <span>Restart</span></h1>
    <p class="heroText">Entra nella fortezza, prepara il tuo cavaliere e scegli come combattere: stanza privata, bot di allenamento o partita pubblica. Il menu ora ha uno stile più fantasy e una luce dinamica che segue la freccia come una torcia.</p>
    <div class="heroHint">Muovi il cursore sul menu: il punto illuminato segue la freccia.</div>
@@ -398,7 +398,7 @@ overflow:hidden}
    </div>
 
    <div class="menuFooter">
-    <div class="footerNote">Menu rinnovato con stile castello fantasy, atmosfera più avventurosa e selezione più leggibile. L'arena è stata ritoccata visivamente senza toccare il cuore del gameplay.</div>
+    <div class="footerNote">Menu fantasy + personaggi con movimenti più fluidi e articolati. L'arena è stata ritoccata visivamente senza toccare il cuore del gameplay.</div>
     <p class="small" id="menuError"></p>
    </div>
    <div class="menuScrollHint">↕ Scorri per vedere tutte le modalità</div>
@@ -564,12 +564,56 @@ function makeKnight(color=0x6f3436){
  const bodyMat=new THREE.MeshStandardMaterial({color,roughness:.65,metalness:.25,emissive:0x000000});
  const metal=new THREE.MeshStandardMaterial({color:0x929798,roughness:.48,metalness:.7,emissive:0x000000});
  const legMat=new THREE.MeshStandardMaterial({color:0x34383a,roughness:.8,emissive:0x000000});
+ const visorMat=new THREE.MeshStandardMaterial({color:0x25282a,roughness:.4,metalness:.8,emissive:0x000000});
  g.userData.bodyMat=bodyMat;g.userData.metalMat=metal;g.userData.legMat=legMat;
- const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.85,5,10),bodyMat);body.position.y=1.05;body.castShadow=true;g.add(body);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.34,16,12),metal);head.position.y=1.95;head.castShadow=true;g.add(head);
- const visor=new THREE.Mesh(new THREE.BoxGeometry(.5,.13,.1),new THREE.MeshStandardMaterial({color:0x25282a,roughness:.4,metalness:.8,emissive:0x000000}));visor.position.set(0,1.96,-.31);g.add(visor);
- for(const sx of [-1,1]){const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.65,4,8),metal);arm.position.set(.53*sx,1.15,0);arm.rotation.z=.18*sx;arm.castShadow=true;g.add(arm)}
- for(const sx of [-1,1]){const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.65,4,8),legMat);leg.position.set(.21*sx,.36,0);leg.castShadow=true;g.add(leg)}
+
+ // Busto separato: può ruotare e respirare senza trascinare gambe e testa come un blocco unico.
+ const torso=new THREE.Group();
+ torso.position.set(0,1.05,0);
+ g.add(torso);
+ const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.85,5,10),bodyMat);
+ body.castShadow=true;
+ torso.add(body);
+
+ // Testa su un pivot indipendente: guarda nella direzione del giocatore prima del resto del corpo.
+ const headPivot=new THREE.Group();
+ headPivot.position.set(0,1.69,0);
+ g.add(headPivot);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.34,16,12),metal);
+ head.position.y=.26;head.castShadow=true;
+ headPivot.add(head);
+ const visor=new THREE.Mesh(new THREE.BoxGeometry(.5,.13,.1),visorMat);
+ visor.position.set(0,.27,-.31);
+ headPivot.add(visor);
+
+ // Braccia articolate dalle spalle.
+ const leftArm=new THREE.Group(),rightArm=new THREE.Group();
+ leftArm.position.set(-.52,1.42,0);
+ rightArm.position.set(.52,1.42,0);
+ g.add(leftArm,rightArm);
+ const leftArmMesh=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.65,4,8),metal);
+ const rightArmMesh=leftArmMesh.clone();
+ leftArmMesh.position.y=-.28;rightArmMesh.position.y=-.28;
+ leftArmMesh.rotation.z=-.18;rightArmMesh.rotation.z=.18;
+ leftArmMesh.castShadow=rightArmMesh.castShadow=true;
+ leftArm.add(leftArmMesh);rightArm.add(rightArmMesh);
+
+ // Gambe articolate dalle anche.
+ const leftLeg=new THREE.Group(),rightLeg=new THREE.Group();
+ leftLeg.position.set(-.21,.72,0);
+ rightLeg.position.set(.21,.72,0);
+ g.add(leftLeg,rightLeg);
+ const leftLegMesh=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.65,4,8),legMat);
+ const rightLegMesh=leftLegMesh.clone();
+ leftLegMesh.position.y=-.36;rightLegMesh.position.y=-.36;
+ leftLegMesh.castShadow=rightLegMesh.castShadow=true;
+ leftLeg.add(leftLegMesh);rightLeg.add(rightLegMesh);
+
+ g.userData.rig={
+  torso,headPivot,leftArm,rightArm,leftLeg,rightLeg,
+  torsoBaseY:torso.position.y,
+  headBaseY:headPivot.position.y
+ };
  return g;
 }
 function makeNameTag(name){
@@ -612,7 +656,19 @@ function getRemoteAvatar(p){
  if(!avatar){
   const group=makeKnight();
   scene.add(group);
-  avatar={group,pos:new THREE.Vector3(p.x,p.y||0,p.z),yaw:p.yaw||0,skin:"",name:"",tag:null};
+  avatar={
+   group,
+   pos:new THREE.Vector3(p.x,p.y||0,p.z),
+   yaw:p.yaw||0,
+   skin:"",
+   name:"",
+   tag:null,
+   moveAmount:0,
+   walkPhase:Math.random()*Math.PI*2,
+   idlePhase:Math.random()*Math.PI*2,
+   lastVisualX:p.x,
+   lastVisualZ:p.z
+  };
   remoteAvatars.set(p.id,avatar);
  }
  if(avatar.skin!==p.skin)applyRemoteSkin(avatar,p.skin);
@@ -1265,6 +1321,65 @@ function animateWeapons(dt){
   bowArrow.visible=false;
  }
 }
+function animateRemoteKnight(avatar,p,dt){
+ const rig=avatar.group.userData.rig;
+ if(!rig)return;
+
+ // Movimento reale del modello sullo schermo, smussato per evitare scatti della rete.
+ const dx=avatar.pos.x-avatar.lastVisualX;
+ const dz=avatar.pos.z-avatar.lastVisualZ;
+ avatar.lastVisualX=avatar.pos.x;
+ avatar.lastVisualZ=avatar.pos.z;
+ const visualSpeed=Math.min(7,Math.hypot(dx,dz)/Math.max(.001,dt));
+ const targetMove=Math.min(1,visualSpeed/3.2);
+ avatar.moveAmount+=(targetMove-avatar.moveAmount)*Math.min(1,dt*7.5);
+
+ const move=avatar.moveAmount;
+ avatar.walkPhase+=dt*(4.0+move*6.2);
+ const s=Math.sin(avatar.walkPhase);
+ const c=Math.cos(avatar.walkPhase);
+ const now=performance.now()*.001+avatar.idlePhase;
+
+ // Le gambe camminano in opposizione, non più come un pezzo unico.
+ rig.leftLeg.rotation.x=s*.66*move;
+ rig.rightLeg.rotation.x=-s*.66*move;
+ rig.leftLeg.rotation.z=.025*c*move;
+ rig.rightLeg.rotation.z=-.025*c*move;
+
+ // Braccia controbilanciano le gambe. In parata salgono in modo morbido.
+ const block=p.blocking?1:0;
+ const armSwing=.42*move;
+ const blockEase=Math.min(1,dt*10);
+ rig.leftArm.rotation.x+=((block?-.78:(-s*armSwing))-rig.leftArm.rotation.x)*blockEase;
+ rig.rightArm.rotation.x+=((block?-.58:(s*armSwing))-rig.rightArm.rotation.x)*blockEase;
+ rig.leftArm.rotation.z+=((block?-.18:0)-rig.leftArm.rotation.z)*blockEase;
+ rig.rightArm.rotation.z+=((block?.18:0)-rig.rightArm.rotation.z)*blockEase;
+
+ // Piccolo passo verticale + respiro da fermo.
+ const stepBob=Math.abs(s)*.035*move;
+ const breathe=Math.sin(now*1.7)*.012*(1-move*.55);
+ rig.torso.position.y=rig.torsoBaseY+stepBob+breathe;
+ rig.headPivot.position.y=rig.headBaseY+stepBob*.55+breathe*.65;
+ rig.torso.scale.y=1+Math.sin(now*1.7)*.008*(1-move*.45);
+
+ // Quando il giocatore gira, testa e busto anticipano le gambe.
+ let turnLead=(p.yaw||0)-avatar.yaw;
+ while(turnLead>Math.PI)turnLead-=Math.PI*2;
+ while(turnLead<-Math.PI)turnLead+=Math.PI*2;
+ turnLead=Math.max(-.75,Math.min(.75,turnLead));
+
+ rig.torso.rotation.y+=((turnLead*.38)-rig.torso.rotation.y)*Math.min(1,dt*9);
+ rig.headPivot.rotation.y+=((turnLead*.72)-rig.headPivot.rotation.y)*Math.min(1,dt*12);
+
+ // La testa segue anche un po' l'altezza dello sguardo.
+ const targetPitch=Math.max(-.28,Math.min(.28,(p.pitch||0)*.32));
+ rig.headPivot.rotation.x+=(targetPitch-rig.headPivot.rotation.x)*Math.min(1,dt*9);
+
+ // Leggera inclinazione naturale durante la corsa.
+ rig.torso.rotation.x+=((move*.035)-rig.torso.rotation.x)*Math.min(1,dt*7);
+ rig.torso.rotation.z+=((c*.018*move)-rig.torso.rotation.z)*Math.min(1,dt*7);
+}
+
 function updateVisuals(dt){
  camera.position.set(local.x,1.68+local.y,local.z);camera.rotation.y=local.yaw;camera.rotation.x=local.pitch;
  const moving=controlMode==="mobile"?(Math.abs(mobileMove.forward)+Math.abs(mobileMove.side)>.08):(keys.KeyW||keys.KeyA||keys.KeyS||keys.KeyD);
@@ -1282,8 +1397,9 @@ function updateVisuals(dt){
    let dy=p.yaw-avatar.yaw;
    while(dy>Math.PI)dy-=Math.PI*2;
    while(dy<-Math.PI)dy+=Math.PI*2;
-   avatar.yaw+=dy*Math.min(1,dt*12);
+   avatar.yaw+=dy*Math.min(1,dt*6.5);
    avatar.group.rotation.y=avatar.yaw;
+   animateRemoteKnight(avatar,p,dt);
   }
 
   let flash=remoteHitFlashes.get(p.id)||0;
