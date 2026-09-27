@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v2.4</title>
+<title>Pixel Knight RESTART v2.5</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -285,6 +285,292 @@ overflow:hidden}
   }
 }
 
+
+/* ===== v2.5 HUB A CARTE - FANTASY ELEGANTE ===== */
+#menu{
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  padding:28px 16px 60px !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(99,91,116,.30), transparent 38%),
+    radial-gradient(circle at 16% 82%, rgba(111,75,31,.16), transparent 30%),
+    radial-gradient(circle at 86% 76%, rgba(111,75,31,.13), transparent 30%),
+    linear-gradient(160deg,#11141b 0%,#090b10 48%,#05070a 100%) !important;
+  touch-action:pan-y !important;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Elimina DEFINITIVAMENTE la vecchia luce e le bande nere decorative */
+#menu::before,
+#menu::after,
+#menu .menuModal::after,
+#menu .menuHero::after{
+  content:none !important;
+  display:none !important;
+  background:none !important;
+}
+
+#menu .elegantHub{
+  width:min(1080px,96vw) !important;
+  max-height:none !important;
+  overflow:visible !important;
+  padding:0 !important;
+  margin:0 auto 32px !important;
+  border-radius:22px !important;
+  border:1px solid rgba(205,176,107,.34) !important;
+  background:
+    linear-gradient(180deg,rgba(24,27,35,.97),rgba(10,12,16,.985)) !important;
+  box-shadow:
+    0 28px 80px rgba(0,0,0,.58),
+    inset 0 1px 0 rgba(255,255,255,.04) !important;
+  backdrop-filter:blur(8px);
+}
+
+#menu .hubHeader{
+  text-align:center;
+  padding:32px 24px 25px;
+  border-bottom:1px solid rgba(207,178,105,.15);
+  background:
+    radial-gradient(circle at 50% -20%,rgba(222,190,108,.13),transparent 52%),
+    linear-gradient(180deg,rgba(44,47,60,.50),rgba(18,21,28,.12));
+}
+#menu .hubKicker{
+  display:inline-block;
+  color:#d7b872;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.22em;
+  margin-bottom:12px;
+}
+#menu .hubHeader h1{
+  margin:0;
+  font-size:clamp(38px,6vw,72px);
+  line-height:.9;
+  letter-spacing:.035em;
+  font-weight:1000;
+  color:#f4f1e8;
+  text-shadow:0 5px 24px rgba(0,0,0,.55);
+}
+#menu .hubSubtitle{
+  margin-top:13px;
+  color:#e1c582;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(18px,2.2vw,25px);
+  font-style:italic;
+}
+#menu .hubHeader p{
+  max-width:650px;
+  margin:10px auto 0;
+  color:#999b9e;
+  font-size:13px;
+}
+
+#menu .hubGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  padding:20px 20px 10px;
+}
+#menu .hubCard{
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  position:relative;
+  padding:18px !important;
+  border-radius:15px !important;
+  border:1px solid rgba(163,151,119,.25) !important;
+  background:
+    linear-gradient(145deg,rgba(37,40,49,.96),rgba(18,20,26,.98)) !important;
+  color:#eee9dc !important;
+  text-align:left;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+  transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;
+}
+#menu .hubCard:hover{
+  transform:translateY(-3px);
+  border-color:rgba(221,188,108,.62) !important;
+  background:
+    linear-gradient(145deg,rgba(48,48,51,.98),rgba(23,24,28,.99)) !important;
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(229,197,118,.05);
+}
+#menu .hubCard.active{
+  border-color:#d7b66c !important;
+  background:
+    linear-gradient(145deg,rgba(69,57,34,.95),rgba(30,27,23,.99)) !important;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.30),
+    inset 0 0 0 1px rgba(244,213,135,.10);
+}
+#menu .hubIcon{
+  display:grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  border-radius:11px;
+  margin-bottom:14px;
+  color:#e5c57c;
+  background:rgba(210,177,96,.09);
+  border:1px solid rgba(217,184,105,.22);
+  font-size:22px;
+}
+#menu .hubCardText{
+  display:block;
+  padding-right:20px;
+}
+#menu .hubCardText strong{
+  display:block;
+  font-size:17px;
+  margin-bottom:7px;
+  color:#f2eee4;
+}
+#menu .hubCardText small{
+  display:block;
+  color:#9ea0a3;
+  font-size:11.5px;
+  line-height:1.45;
+  font-weight:500;
+}
+#menu .hubArrow{
+  position:absolute;
+  right:15px;
+  bottom:13px;
+  color:#8b8069;
+  font-size:28px;
+  line-height:1;
+}
+#menu .hubCard.active .hubArrow{color:#e0c27d}
+
+#menu .hubConfig{
+  margin:10px 20px 22px;
+  padding:20px;
+  border-radius:16px;
+  border:1px solid rgba(185,163,107,.20);
+  background:
+    linear-gradient(180deg,rgba(15,17,22,.93),rgba(9,11,14,.97));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+#menu .hubPane{display:none}
+#menu .hubPane.active{
+  display:block;
+  animation:hubPaneIn .18s ease-out;
+}
+@keyframes hubPaneIn{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+#menu .paneHeading{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  margin-bottom:15px;
+}
+#menu .paneEyebrow{
+  display:block;
+  color:#b99a59;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.18em;
+  margin-bottom:5px;
+}
+#menu .paneHeading h2{
+  margin:0;
+  font-size:25px;
+  color:#f0ece2;
+}
+#menu .paneRune{
+  color:#d6b56d;
+  font-size:28px;
+  opacity:.75;
+}
+
+#menu .hubConfig input{
+  min-height:46px;
+  background:#0c0e12 !important;
+  border:1px solid #44454a !important;
+  color:#f4efe5 !important;
+  border-radius:11px !important;
+  padding:11px 13px !important;
+}
+#menu .hubConfig input:focus{
+  outline:none;
+  border-color:#b89a5c !important;
+  box-shadow:0 0 0 3px rgba(184,154,92,.09);
+}
+#menu .hubLabel{
+  margin:15px 0 8px;
+  color:#bba36d;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+#menu .hubActions{
+  display:grid;
+  gap:9px;
+  margin-top:12px;
+}
+#menu .hubActions.three{grid-template-columns:repeat(3,1fr)}
+#menu .hubActions.single{grid-template-columns:minmax(220px,360px)}
+#menu .hubConfig button{
+  min-height:45px;
+  border-radius:11px !important;
+  border:1px solid #5b594f !important;
+  background:linear-gradient(180deg,#292b30,#1c1e22) !important;
+  color:#f2ede2 !important;
+  transition:transform .14s ease,border-color .14s ease,filter .14s ease;
+}
+#menu .hubConfig button:hover{
+  transform:translateY(-1px);
+  border-color:#bd9e5c !important;
+  filter:brightness(1.08);
+}
+#menu .hubConfig button.primary{
+  background:linear-gradient(180deg,#53634b,#354132) !important;
+  border-color:#71806a !important;
+}
+#menu .hubJoinGrid{
+  display:grid;
+  grid-template-columns:1.5fr .8fr;
+  gap:9px;
+}
+#menu .hubNote{
+  margin:10px 0 0;
+  color:#85898d;
+  font-size:11px;
+  line-height:1.45;
+}
+#menu .hubError{
+  min-height:18px;
+  margin:12px 0 0;
+  color:#e39a84;
+  font-size:12px;
+  font-weight:700;
+}
+
+@media(max-width:850px){
+  #menu .hubGrid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  #menu{padding:8px 7px 46px !important}
+  #menu .elegantHub{width:100% !important;border-radius:14px !important}
+  #menu .hubHeader{padding:24px 15px 20px}
+  #menu .hubGrid{grid-template-columns:1fr;padding:13px 12px 6px}
+  #menu .hubCard{min-height:105px}
+  #menu .hubConfig{margin:8px 12px 14px;padding:15px}
+  #menu .hubActions.three{grid-template-columns:1fr}
+  #menu .hubActions.single{grid-template-columns:1fr}
+  #menu .hubJoinGrid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -337,71 +623,121 @@ overflow:hidden}
 </div>
 
 <div class="overlay show" id="menu">
- <div class="modal menuModal">
-  <div class="menuHero">
-   <div class="eyebrow">⚔ Fantasy Arena • Menu v2.4.1</div>
-   <h1 class="heroTitle">Pixel Knight <span>Restart</span></h1>
-   <p class="heroText">Entra nella fortezza, prepara il tuo cavaliere e scegli come combattere: stanza privata, bot di allenamento o partita pubblica. Il menu ora ha uno stile più fantasy e una luce dinamica che segue la freccia come una torcia.</p>
-   <div class="heroHint">Muovi il cursore sul menu: il punto illuminato segue la freccia.</div>
+ <div class="modal elegantHub">
+  <div class="hubHeader">
+   <div class="hubKicker">⚔ FANTASY ARENA</div>
+   <h1>PIXEL KNIGHT</h1>
+   <div class="hubSubtitle">Scegli come entrare nell'arena</div>
+   <p>Seleziona una modalità. Le opzioni compariranno sotto senza riempire tutta la schermata.</p>
   </div>
-  <div class="menuPanel">
-   <div class="menuMainGrid">
-    <div class="menuColumn">
-     <div class="modeCard">
-      <h3>👥 Stanza privata</h3>
-      <p class="modeDesc">Crea una lobby e scegli il formato del duello prima di invitare gli amici.</p>
-      <input id="createName" maxlength="18" placeholder="Il tuo nome"/>
-      <div class="line"></div>
-      <div class="formatTitle">Formato partita</div>
-      <div class="botBtns">
-       <button class="primary" data-private-format="1v1">1 contro 1</button>
-       <button class="primary" data-private-format="1v1v1">1v1v1</button>
-       <button class="primary" data-private-format="2v2">2 contro 2</button>
-      </div>
-     </div>
 
-     <div class="modeCard">
-      <h3>🔗 Entra con codice</h3>
-      <p class="modeDesc">Hai già un codice stanza? Inseriscilo qui per entrare subito nel duello.</p>
-      <input id="joinName" maxlength="18" placeholder="Il tuo nome"/>
-      <div style="height:8px"></div>
-      <input id="joinCode" maxlength="6" placeholder="Codice stanza"/>
-      <div style="height:10px"></div>
-      <button class="primary" id="joinBtn">Entra nel duello</button>
+  <div class="hubGrid" id="hubGrid">
+   <button type="button" class="hubCard active" data-hub-mode="private">
+    <span class="hubIcon">⚔</span>
+    <span class="hubCardText">
+     <strong>Stanza privata</strong>
+     <small>Crea una lobby e invita i tuoi amici.</small>
+    </span>
+    <span class="hubArrow">›</span>
+   </button>
+
+   <button type="button" class="hubCard" data-hub-mode="bot">
+    <span class="hubIcon">♞</span>
+    <span class="hubCardText">
+     <strong>Allenamento</strong>
+     <small>Combatti contro un bot e prova le armi.</small>
+    </span>
+    <span class="hubArrow">›</span>
+   </button>
+
+   <button type="button" class="hubCard" data-hub-mode="public">
+    <span class="hubIcon">◈</span>
+    <span class="hubCardText">
+     <strong>Gioca pubblico</strong>
+     <small>Cerca automaticamente un avversario online.</small>
+    </span>
+    <span class="hubArrow">›</span>
+   </button>
+
+   <button type="button" class="hubCard" data-hub-mode="join">
+    <span class="hubIcon">⌘</span>
+    <span class="hubCardText">
+     <strong>Entra con codice</strong>
+     <small>Unisciti direttamente a una stanza esistente.</small>
+    </span>
+    <span class="hubArrow">›</span>
+   </button>
+  </div>
+
+  <div class="hubConfig">
+   <div class="hubPane active" data-hub-pane="private">
+    <div class="paneHeading">
+     <div>
+      <span class="paneEyebrow">STANZA PRIVATA</span>
+      <h2>Prepara il duello</h2>
      </div>
+     <div class="paneRune">⚔</div>
     </div>
-
-    <div class="menuColumn">
-     <div class="modeCard botCard">
-      <h3>🤖 Allenamento contro bot</h3>
-      <p class="modeDesc">Perfetto per provare comandi, armi e mappe senza aspettare altri giocatori.</p>
-      <input id="botName" maxlength="18" placeholder="Il tuo nome"/>
-      <div class="line"></div>
-      <div class="subLabel">Scegli la difficoltà</div>
-      <div class="botBtns">
-       <button data-bot="easy">Facile</button>
-       <button data-bot="medium">Medio</button>
-       <button data-bot="hard">Difficile</button>
-      </div>
-      <p class="small" style="margin-top:10px">Facile è lento e non para. Medio è più aggressivo. Difficile si muove meglio e usa anche lo scudo.</p>
-     </div>
-
-     <div class="modeCard publicCard">
-      <h3>🌐 Gioca pubblico</h3>
-      <p class="modeDesc">Cerca automaticamente un altro giocatore online che sta cercando una partita nello stesso momento.</p>
-      <input id="publicName" maxlength="18" placeholder="Il tuo nome"/>
-      <div style="height:10px"></div>
-      <button class="primary" id="publicBtn">Cerca un avversario online</button>
-      <p class="small" style="margin-top:10px">La ricerca prova ad abbinarti con un altro giocatore con questo stesso gioco aperto.</p>
-     </div>
+    <input id="createName" maxlength="18" placeholder="Il tuo nome"/>
+    <div class="hubLabel">Formato partita</div>
+    <div class="hubActions three">
+     <button class="primary" data-private-format="1v1">1 contro 1</button>
+     <button class="primary" data-private-format="1v1v1">1v1v1</button>
+     <button class="primary" data-private-format="2v2">2 contro 2</button>
     </div>
    </div>
 
-   <div class="menuFooter">
-    <div class="footerNote">Menu fantasy + personaggi con movimenti più fluidi e articolati. L'arena è stata ritoccata visivamente senza toccare il cuore del gameplay.</div>
-    <p class="small" id="menuError"></p>
+   <div class="hubPane" data-hub-pane="bot">
+    <div class="paneHeading">
+     <div>
+      <span class="paneEyebrow">ALLENAMENTO</span>
+      <h2>Scegli la difficoltà</h2>
+     </div>
+     <div class="paneRune">♞</div>
+    </div>
+    <input id="botName" maxlength="18" placeholder="Il tuo nome"/>
+    <div class="hubLabel">Livello del bot</div>
+    <div class="hubActions three">
+     <button data-bot="easy">Facile</button>
+     <button data-bot="medium">Medio</button>
+     <button data-bot="hard">Difficile</button>
+    </div>
+    <p class="hubNote">Facile è più lento. Medio è aggressivo. Difficile usa meglio movimento e scudo.</p>
    </div>
-   <div class="menuScrollHint">↕ Scorri per vedere tutte le modalità</div>
+
+   <div class="hubPane" data-hub-pane="public">
+    <div class="paneHeading">
+     <div>
+      <span class="paneEyebrow">MATCHMAKING</span>
+      <h2>Trova un avversario</h2>
+     </div>
+     <div class="paneRune">◈</div>
+    </div>
+    <input id="publicName" maxlength="18" placeholder="Il tuo nome"/>
+    <div class="hubActions single">
+     <button class="primary" id="publicBtn">Cerca partita online</button>
+    </div>
+    <p class="hubNote">Ti abbina a un altro giocatore che sta cercando una partita nello stesso momento.</p>
+   </div>
+
+   <div class="hubPane" data-hub-pane="join">
+    <div class="paneHeading">
+     <div>
+      <span class="paneEyebrow">CODICE STANZA</span>
+      <h2>Entra nella lobby</h2>
+     </div>
+     <div class="paneRune">⌘</div>
+    </div>
+    <div class="hubJoinGrid">
+     <input id="joinName" maxlength="18" placeholder="Il tuo nome"/>
+     <input id="joinCode" maxlength="6" placeholder="CODICE"/>
+    </div>
+    <div class="hubActions single">
+     <button class="primary" id="joinBtn">Entra nel duello</button>
+    </div>
+   </div>
+
+   <p class="hubError" id="menuError"></p>
   </div>
  </div>
 </div>
@@ -464,24 +800,17 @@ const ui={
  damage:document.getElementById("damage"),cross:document.getElementById("cross"),damageNumbers:document.getElementById("damageNumbers")
 };
 
-const menuModal=document.querySelector("#menu .menuModal");
-const setMenuTorch=(clientX,clientY)=>{
- if(!menuModal)return;
- const r=menuModal.getBoundingClientRect();
- if(!r.width||!r.height)return;
- const x=((clientX-r.left)/r.width)*100;
- const y=((clientY-r.top)/r.height)*100;
- menuModal.style.setProperty("--mx",`${Math.max(0,Math.min(100,x)).toFixed(1)}%`);
- menuModal.style.setProperty("--my",`${Math.max(0,Math.min(100,y)).toFixed(1)}%`);
-};
-menu.addEventListener("pointermove",e=>setMenuTorch(e.clientX,e.clientY),{passive:true});
-menu.addEventListener("pointerdown",e=>setMenuTorch(e.clientX,e.clientY),{passive:true});
-menu.addEventListener("pointerleave",()=>{
- if(menuModal){
-  menuModal.style.setProperty("--mx","50%");
-  menuModal.style.setProperty("--my","30%");
+const hubCards=[...document.querySelectorAll("#menu .hubCard")];
+const hubPanes=[...document.querySelectorAll("#menu .hubPane")];
+function selectHubMode(mode){
+ hubCards.forEach(card=>card.classList.toggle("active",card.dataset.hubMode===mode));
+ hubPanes.forEach(pane=>pane.classList.toggle("active",pane.dataset.hubPane===mode));
+ const activePane=hubPanes.find(p=>p.dataset.hubPane===mode);
+ if(activePane && innerWidth<700){
+  setTimeout(()=>activePane.scrollIntoView({behavior:"smooth",block:"nearest"}),20);
  }
-});
+}
+hubCards.forEach(card=>card.addEventListener("click",()=>selectHubMode(card.dataset.hubMode)));
 
 const MAP_INFO={
  keep:{name:"Fortezza di Pietra",arena:16,obstacles:[{x:0,z:0,r:1.65}]},
