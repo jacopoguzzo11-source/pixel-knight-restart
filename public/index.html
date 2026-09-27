@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v2.5</title>
+<title>Pixel Knight RESTART v2.7</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -571,6 +571,465 @@ overflow:hidden}
   #menu .hubJoinGrid{grid-template-columns:1fr}
 }
 
+
+/* ===== v2.6 LOBBY FANTASY ELEGANTE ===== */
+#lobby,
+#matchmaking,
+#inventory,
+#settings{
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,205,120,.08), transparent 24%),
+    linear-gradient(180deg, rgba(8,9,12,.78), rgba(5,6,8,.93));
+}
+#lobby .modal,
+#matchmaking .modal,
+#inventory .modal,
+#settings .modal{
+  width:min(1120px,96vw);
+  max-height:92vh;
+  overflow:auto;
+  border-radius:22px;
+  border:1px solid rgba(203,173,96,.34);
+  background:
+    linear-gradient(180deg, rgba(34,39,48,.22), rgba(14,15,18,.1) 18%),
+    linear-gradient(180deg, rgba(19,22,27,.97), rgba(10,11,14,.985));
+  box-shadow:0 28px 80px rgba(0,0,0,.56), inset 0 0 0 1px rgba(255,234,188,.035);
+  backdrop-filter:blur(8px);
+  scrollbar-width:thin;
+  scrollbar-color:#b58a45 #121417;
+}
+#lobby .modal::-webkit-scrollbar,
+#matchmaking .modal::-webkit-scrollbar,
+#inventory .modal::-webkit-scrollbar,
+#settings .modal::-webkit-scrollbar{width:11px}
+#lobby .modal::-webkit-scrollbar-track,
+#matchmaking .modal::-webkit-scrollbar-track,
+#inventory .modal::-webkit-scrollbar-track,
+#settings .modal::-webkit-scrollbar-track{background:#101215}
+#lobby .modal::-webkit-scrollbar-thumb,
+#matchmaking .modal::-webkit-scrollbar-thumb,
+#inventory .modal::-webkit-scrollbar-thumb,
+#settings .modal::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#d1ab63,#785224);border:3px solid #101215;border-radius:999px}
+
+#lobby .modal{
+  padding:0;
+  overflow:hidden auto;
+}
+#lobbyTitle{
+  margin:0;
+  padding:26px 28px 6px;
+  font-size:clamp(28px,3vw,42px);
+  font-weight:1000;
+  letter-spacing:.02em;
+  text-transform:none;
+  color:#f7efdc;
+  text-shadow:0 4px 18px rgba(0,0,0,.45);
+}
+#lobbyHelp{
+  margin:0;
+  padding:0 28px 16px;
+  color:#c6bfae;
+  line-height:1.6;
+  border-bottom:1px solid rgba(203,173,96,.16);
+}
+#roomCode{
+  display:inline-flex;
+  margin:0 28px 16px;
+  padding:10px 18px;
+  border-radius:999px;
+  border:1px solid rgba(224,192,112,.3);
+  background:rgba(17,18,22,.6);
+  color:#e8c97f;
+  font-size:26px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+}
+#players{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:10px;
+  padding:18px 28px 8px;
+}
+#lobby .lobbybox{
+  margin:0 !important;
+  border-radius:16px;
+  border:1px solid rgba(198,170,99,.22);
+  background:linear-gradient(180deg, rgba(30,34,40,.96), rgba(16,18,21,.98));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+  padding:14px 15px !important;
+}
+#lobby .lobbybox b{font-size:15px;color:#f4edd8}
+#lobby h3{
+  margin:10px 28px 8px;
+  padding-top:8px;
+  font-size:14px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#deb96b;
+}
+#lobby .mapGrid,
+#lobby .choiceGrid,
+#lobby .store,
+#lobby #shieldGrid,
+#lobby #weaponGrid,
+#inventory .choiceGrid{
+  margin:0 28px 0;
+}
+#lobby .mapGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#lobby .choiceGrid{gap:10px}
+#lobby .store{gap:10px}
+#lobby .mapGrid button,
+#lobby .choiceGrid button,
+#inventory .choiceGrid button,
+#lobby .store .item button,
+#lobby #readyBtn,
+#matchmaking button,
+#settings button,
+#inventory button{
+  min-height:48px;
+  border-radius:13px;
+  border:1px solid rgba(120,108,79,.95);
+  background:linear-gradient(180deg, rgba(34,38,43,.98), rgba(20,23,27,.99));
+  color:#f2ead8;
+  font-weight:800;
+  transition:transform .14s ease, box-shadow .14s ease, filter .14s ease, border-color .14s ease;
+}
+#lobby .mapGrid button:hover,
+#lobby .choiceGrid button:hover,
+#inventory .choiceGrid button:hover,
+#lobby .store .item button:hover,
+#lobby #readyBtn:hover,
+#matchmaking button:hover,
+#settings button:hover,
+#inventory button:hover{
+  transform:translateY(-1px);
+  border-color:rgba(235,201,118,.9);
+  box-shadow:0 0 24px rgba(255,186,76,.14);
+  filter:brightness(1.08);
+}
+#lobby button.selected,
+#inventory button.selected,
+#lobby .mapBtn.selected,
+#lobby .skinBtn.selected{
+  border-color:#f0c96a !important;
+  background:linear-gradient(180deg, #61481f, #463217) !important;
+  box-shadow:0 0 0 1px rgba(240,201,106,.45) inset, 0 0 18px rgba(255,192,74,.12);
+}
+#lobby .skinBtn{
+  min-height:66px;
+  justify-content:flex-start;
+  padding:12px 14px;
+}
+#lobby .item{
+  border-radius:16px;
+  border:1px solid rgba(198,170,99,.22);
+  background:linear-gradient(180deg, rgba(31,35,41,.98), rgba(17,19,23,.99));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+  padding:14px 14px 12px;
+}
+#lobby .item strong{font-size:16px;color:#f5eed9;margin-bottom:6px}
+#lobby .item .small{color:#bab29f;line-height:1.45;display:block;min-height:38px}
+#lobby .item span{display:inline-block;margin-top:6px;color:#e1bf6d;font-weight:900}
+#lobby .statusLine{
+  margin:18px 28px 0;
+  padding:13px 14px;
+  border-radius:14px;
+  border:1px solid rgba(198,170,99,.18);
+  background:rgba(18,20,24,.86);
+  color:#d3c8b1;
+}
+#lobby #readyBtn{
+  margin:16px 28px 28px;
+  min-width:220px;
+  min-height:54px;
+  font-size:16px;
+  background:linear-gradient(180deg, #486446, #314631);
+  border-color:#799074;
+}
+#lobby .swatch{box-shadow:0 0 0 2px rgba(255,255,255,.06) inset, 0 0 0 1px rgba(0,0,0,.3)}
+#matchmaking .modal,
+#settings .modal,
+#inventory .modal{padding:24px}
+#matchmaking h2,
+#settings h2,
+#inventory h2{color:#f6eed8;font-size:28px;margin-bottom:10px}
+#matchmaking p,
+#settings p,
+#inventory p{color:#c5beac}
+
+@media(max-width:760px){
+  #lobbyTitle{padding:22px 18px 6px;font-size:26px}
+  #lobbyHelp{padding:0 18px 14px}
+  #roomCode{margin:0 18px 14px;font-size:22px}
+  #players{padding:16px 18px 8px;grid-template-columns:1fr}
+  #lobby h3{margin:10px 18px 8px}
+  #lobby .mapGrid,
+  #lobby .choiceGrid,
+  #lobby .store,
+  #lobby #shieldGrid,
+  #lobby #weaponGrid,
+  #inventory .choiceGrid{margin:0 18px 0}
+  #lobby .mapGrid{grid-template-columns:1fr}
+  #lobby .statusLine{margin:16px 18px 0}
+  #lobby #readyBtn{margin:16px 18px 22px;width:calc(100% - 36px)}
+}
+
+/* ===== v2.7 LOBBY = STESSO STILE HUB FANTASY ELEGANTE ===== */
+#fullscreenBtn{
+  position:absolute;
+  right:66px;
+  top:82px;
+  pointer-events:auto;
+  z-index:25;
+  width:46px;
+  height:46px;
+  padding:0;
+  font-size:22px;
+}
+#fullscreenBtn.active{
+  border-color:#d7b66c;
+  background:linear-gradient(180deg,#5b4828,#3e301c);
+}
+#lobby{
+  align-items:flex-start !important;
+  justify-content:center !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  padding:24px 14px 60px !important;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(99,91,116,.28),transparent 38%),
+    radial-gradient(circle at 12% 80%,rgba(111,75,31,.13),transparent 28%),
+    radial-gradient(circle at 88% 76%,rgba(111,75,31,.11),transparent 28%),
+    linear-gradient(160deg,#11141b 0%,#090b10 48%,#05070a 100%) !important;
+  touch-action:pan-y !important;
+}
+#lobby .lobbyElegant{
+  width:min(1080px,96vw) !important;
+  max-height:none !important;
+  overflow:visible !important;
+  padding:0 !important;
+  margin:0 auto 30px !important;
+  border-radius:22px !important;
+  border:1px solid rgba(205,176,107,.34) !important;
+  background:linear-gradient(180deg,rgba(24,27,35,.97),rgba(10,12,16,.985)) !important;
+  box-shadow:0 28px 80px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+#lobby .lobbyHero{
+  padding:30px 28px 24px;
+  border-bottom:1px solid rgba(207,178,105,.15);
+  background:
+    radial-gradient(circle at 50% -20%,rgba(222,190,108,.12),transparent 50%),
+    linear-gradient(180deg,rgba(44,47,60,.48),rgba(18,21,28,.12));
+}
+#lobby .lobbyKicker{
+  color:#d7b872;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.22em;
+  margin-bottom:9px;
+}
+#lobbyTitle{
+  padding:0 !important;
+  margin:0 !important;
+  font-size:clamp(30px,4vw,48px) !important;
+  line-height:1;
+  color:#f4f1e8 !important;
+}
+#lobbyHelp{
+  padding:0 !important;
+  margin:12px 0 0 !important;
+  max-width:760px;
+  border:0 !important;
+  color:#aeb0b2 !important;
+  font-size:13px;
+}
+#roomCode{
+  margin:16px 0 0 !important;
+  padding:8px 15px !important;
+  font-size:20px !important;
+  letter-spacing:.18em !important;
+  border:1px solid rgba(217,184,105,.28) !important;
+  background:rgba(16,18,22,.54) !important;
+  color:#e8c97f !important;
+}
+#lobby .lobbyBody{
+  padding:20px;
+}
+#lobby .lobbySection{
+  padding:18px;
+  margin-bottom:14px;
+  border-radius:16px;
+  border:1px solid rgba(193,171,111,.22);
+  background:linear-gradient(145deg,rgba(31,35,42,.96),rgba(15,17,21,.98));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+#lobby .sectionHead{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+#lobby .sectionHead>span{
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
+  border-radius:10px;
+  border:1px solid rgba(217,184,105,.25);
+  background:rgba(210,177,96,.08);
+  color:#d9b96d;
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.06em;
+}
+#lobby .sectionHead b{
+  display:block;
+  color:#f2eee4;
+  font-size:17px;
+}
+#lobby .sectionHead small{
+  display:block;
+  margin-top:2px;
+  color:#909398;
+  font-size:11px;
+}
+#players{
+  padding:0 !important;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(245px,1fr));
+  gap:9px;
+}
+#lobby .lobbybox{
+  margin:0 !important;
+  border-radius:13px !important;
+  border:1px solid rgba(163,151,119,.24) !important;
+  background:linear-gradient(145deg,rgba(37,40,49,.96),rgba(18,20,26,.98)) !important;
+  padding:13px 14px !important;
+}
+#lobby .lobbybox b{color:#f3eddd}
+#lobby .lobbybox .small{color:#a6a5a0}
+#lobby .mapGrid,
+#lobby .choiceGrid,
+#lobby .store,
+#lobby #shieldGrid,
+#lobby #weaponGrid{
+  margin:0 !important;
+  gap:9px !important;
+}
+#lobby .mapGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+#lobby .mapGrid button,
+#lobby .choiceGrid button,
+#lobby .store .item button{
+  min-height:48px;
+  border-radius:11px !important;
+  border:1px solid #5b594f !important;
+  background:linear-gradient(180deg,#292b30,#1c1e22) !important;
+  color:#f2ede2 !important;
+  transition:transform .14s ease,border-color .14s ease,filter .14s ease,box-shadow .14s ease;
+}
+#lobby .mapGrid button:hover,
+#lobby .choiceGrid button:hover,
+#lobby .store .item button:hover{
+  transform:translateY(-1px);
+  border-color:#bd9e5c !important;
+  filter:brightness(1.08);
+  box-shadow:0 0 22px rgba(255,190,75,.12);
+}
+#lobby button.selected,
+#lobby .mapBtn.selected,
+#lobby .skinBtn.selected{
+  border-color:#d7b66c !important;
+  background:linear-gradient(180deg,#5a4625,#3d301c) !important;
+  box-shadow:inset 0 0 0 1px rgba(244,213,135,.09),0 0 20px rgba(255,190,75,.10) !important;
+}
+#lobby .skinBtn{
+  justify-content:flex-start !important;
+  min-height:64px !important;
+  padding:11px 13px !important;
+}
+#lobby .item{
+  min-height:162px;
+  display:flex;
+  flex-direction:column;
+  border-radius:14px !important;
+  border:1px solid rgba(163,151,119,.24) !important;
+  background:linear-gradient(145deg,rgba(37,40,49,.96),rgba(18,20,26,.98)) !important;
+  padding:14px !important;
+}
+#lobby .item strong{font-size:15px;color:#f2eee4}
+#lobby .item .small{color:#9ea0a3;line-height:1.45;flex:1}
+#lobby .item span{color:#dcb96d;font-weight:900}
+#lobby .item button{margin-top:9px !important}
+#lobby .readyDock{
+  position:sticky;
+  bottom:8px;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:15px 16px;
+  border-radius:16px;
+  border:1px solid rgba(205,176,107,.28);
+  background:rgba(11,13,17,.94);
+  backdrop-filter:blur(10px);
+  box-shadow:0 14px 35px rgba(0,0,0,.38);
+}
+#lobby .readyTitle{
+  color:#f2eee4;
+  font-size:15px;
+  font-weight:900;
+}
+#lobby .statusLine{
+  margin:3px 0 0 !important;
+  padding:0 !important;
+  border:0 !important;
+  background:none !important;
+  color:#9ea0a3 !important;
+}
+#lobby #readyBtn{
+  margin:0 !important;
+  min-width:210px !important;
+  min-height:50px !important;
+  background:linear-gradient(180deg,#53634b,#354132) !important;
+  border-color:#71806a !important;
+}
+#lobby #readyBtn:hover{
+  border-color:#94a48b !important;
+  box-shadow:0 0 26px rgba(129,170,116,.16) !important;
+}
+@media(max-width:760px){
+  #fullscreenBtn{right:58px;top:74px}
+  #lobby{padding:8px 7px 50px !important}
+  #lobby .lobbyElegant{width:100% !important;border-radius:14px !important}
+  #lobby .lobbyHero{padding:23px 16px 19px}
+  #lobby .lobbyBody{padding:12px}
+  #lobby .lobbySection{padding:14px}
+  #lobby .mapGrid{grid-template-columns:1fr}
+  #lobby .readyDock{flex-direction:column;align-items:stretch}
+  #lobby #readyBtn{width:100% !important}
+}
+
+/* piccolo messaggio di ingresso in arena */
+#arenaEntryHint{
+  position:absolute;
+  left:50%;
+  bottom:22px;
+  transform:translateX(-50%);
+  z-index:26;
+  display:none;
+  padding:9px 14px;
+  border-radius:999px;
+  border:1px solid rgba(207,178,105,.3);
+  background:rgba(7,9,12,.74);
+  color:#e4d4aa;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.06em;
+  pointer-events:none;
+}
+#arenaEntryHint.show{display:block}
+
 </style>
 </head>
 <body>
@@ -590,6 +1049,8 @@ overflow:hidden}
   <div id="help" class="card">W avanti · S indietro · A sinistra · D destra<br>SPAZIO salto · SHIFT corsa · Mouse guarda · CLICK SX attacco (con arco: tieni e rilascia)<br>CLICK DX scudo · I inventario · ESC libera mouse</div>
   <div id="damage"></div>
   <button id="settingsBtn" class="card" type="button" aria-label="Impostazioni">⚙</button>
+  <button id="fullscreenBtn" class="card" type="button" aria-label="Schermo intero" title="Schermo intero">⛶</button>
+  <div id="arenaEntryHint">Clicca nell’arena per controllare il cavaliere • ⛶ per schermo intero</div>
   <div id="mobileControls" aria-label="Comandi mobile">
     <div id="moveZone" aria-label="Joystick movimento">
       <div id="joyBase"></div><div id="joyStick"></div>
@@ -752,27 +1213,49 @@ overflow:hidden}
 </div>
 
 <div class="overlay" id="lobby">
- <div class="modal">
-  <h2 id="lobbyTitle">Stanza privata</h2>
-  <div class="roomcode" id="roomCode">------</div>
-  <p id="lobbyHelp">Invia il codice al tuo amico. L'host sceglie la mappa; poi entrambi premete Pronto.</p>
-  <div id="players"></div>
+ <div class="modal lobbyElegant">
+  <div class="lobbyHero">
+   <div class="lobbyKicker">⚔ PREPARAZIONE DUELLO</div>
+   <h2 id="lobbyTitle">Stanza privata</h2>
+   <p id="lobbyHelp">Invia il codice al tuo amico. L'host sceglie la mappa; poi entrambi premete Pronto.</p>
+   <div class="roomcode" id="roomCode">------</div>
+  </div>
 
-  <h3>1. Scegli la mappa</h3>
-  <div class="mapGrid" id="mapGrid"></div>
+  <div class="lobbyBody">
+   <section class="lobbySection playerSection">
+    <div class="sectionHead"><span>01</span><div><b>Cavalieri</b><small>Giocatori presenti nella lobby</small></div></div>
+    <div id="players"></div>
+   </section>
 
-  <h3 style="margin-top:16px">2. Scegli la skin</h3>
-  <div class="choiceGrid" id="skinGrid"></div>
+   <section class="lobbySection">
+    <div class="sectionHead"><span>02</span><div><b>Scegli la mappa</b><small>Il campo dove si svolgerà il combattimento</small></div></div>
+    <div class="mapGrid" id="mapGrid"></div>
+   </section>
 
-  <h3 style="margin-top:16px">3. Armeria</h3>
-  <div class="store" id="store"></div>
+   <section class="lobbySection">
+    <div class="sectionHead"><span>03</span><div><b>Scegli la skin</b><small>L'aspetto del tuo cavaliere</small></div></div>
+    <div class="choiceGrid" id="skinGrid"></div>
+   </section>
 
-  <h3 style="margin-top:16px">4. Equipaggia l'arma</h3>
-  <div class="choiceGrid" id="weaponGrid"></div>
-  <div class="choiceGrid" id="shieldGrid"></div>
+   <section class="lobbySection">
+    <div class="sectionHead"><span>04</span><div><b>Armeria</b><small>Acquista armi, munizioni e scudo</small></div></div>
+    <div class="store" id="store"></div>
+   </section>
 
-  <div class="statusLine" id="selectionStatus"></div>
-  <div style="margin-top:12px"><button class="primary" id="readyBtn">✓ Pronto</button></div>
+   <section class="lobbySection">
+    <div class="sectionHead"><span>05</span><div><b>Equipaggiamento</b><small>Scegli cosa portare in battaglia</small></div></div>
+    <div class="choiceGrid" id="weaponGrid"></div>
+    <div class="choiceGrid" id="shieldGrid"></div>
+   </section>
+
+   <div class="readyDock">
+    <div>
+     <div class="readyTitle">Sei pronto?</div>
+     <div class="statusLine" id="selectionStatus"></div>
+    </div>
+    <button class="primary" id="readyBtn" type="button">✓ Pronto</button>
+   </div>
+  </div>
  </div>
 </div>
 
@@ -1300,7 +1783,9 @@ function refreshLobby(){
   ps.appendChild(d);
  });
  renderMapButtons();renderSkins();renderStore();renderWeaponSelector();renderShieldSelector();refreshInventory();
- const rb=document.getElementById("readyBtn");rb.textContent=me.ready?"Annulla pronto":"✓ Pronto";
+ const rb=document.getElementById("readyBtn");
+ rb.textContent=me.ready?"Annulla pronto":"✓ Pronto";
+ rb.disabled=state.phase!=="lobby";
 }
 function refreshInventory(){
  const c=document.getElementById("invContent");if(!me)return;c.innerHTML="";
@@ -1330,8 +1815,23 @@ function showDamageNumber(amount,blocked=false,heavy=false,targetId=null){
  if(targetId)remoteHitFlashes.set(targetId,.18);
 }
 function enterArena(){
- lobby.classList.remove("show");playing=true;applyControlMode();setMobileControlsVisible();
- if(controlMode==="pc")renderer.domElement.requestPointerLock?.();
+ // Il round deve mostrare SEMPRE l'arena, mai il menu iniziale.
+ menu.classList.remove("show");
+ lobby.classList.remove("show");
+ matchmaking.classList.remove("show");
+ inventory.classList.remove("show");
+ settings.classList.remove("show");
+ playing=true;
+ applyControlMode();
+ setMobileControlsVisible();
+
+ // Non catturiamo più il mouse automaticamente dopo "Pronto":
+ // sembrava un passaggio forzato a una modalità diversa.
+ const hint=document.getElementById("arenaEntryHint");
+ if(controlMode==="pc"&&hint){
+  hint.classList.add("show");
+  setTimeout(()=>hint.classList.remove("show"),4200);
+ }
 }
 function openInventory(){
  if(!playing)return;document.exitPointerLock?.();refreshInventory();inventory.classList.add("show");setMobileControlsVisible();
@@ -1341,7 +1841,14 @@ function closeInventory(){
  if(controlMode==="pc")renderer.domElement.requestPointerLock?.();
 }
 
-socket.on("joined",d=>{myId=d.id;roomCode=d.code;lobbySignature="";menu.classList.remove("show");matchmaking.classList.remove("show");lobby.classList.add("show")});
+socket.on("joined",d=>{
+ myId=d.id;roomCode=d.code;lobbySignature="";
+ menu.classList.remove("show");
+ matchmaking.classList.remove("show");
+ inventory.classList.remove("show");
+ settings.classList.remove("show");
+ lobby.classList.add("show");
+});
 socket.on("joinError",e=>document.getElementById("menuError").textContent=e);
 
 socket.on("matchmakingStatus",d=>{
@@ -1365,7 +1872,15 @@ socket.on("state",s=>{
  if(sig!==lobbySignature){lobbySignature=sig;refreshLobby()}
  if(me&&!locked&&playing&&state.phase!=="active"){local.x=me.x;local.y=me.y||0;local.z=me.z;local.yaw=me.yaw;local.pitch=me.pitch}
 });
-socket.on("roundStart",()=>{showMessage("DUELLO!",1200);me=meFromState();if(me){local.x=me.x;local.y=0;local.z=me.z;local.vy=0;local.onGround=true;local.yaw=me.yaw;local.pitch=0}enterArena();setMobileControlsVisible()});
+socket.on("roundStart",()=>{
+ me=meFromState();
+ if(me){
+  local.x=me.x;local.y=0;local.z=me.z;local.vy=0;local.onGround=true;local.yaw=me.yaw;local.pitch=0;
+ }
+ enterArena();
+ showMessage("DUELLO!",1200);
+ setMobileControlsVisible();
+});
 function mySideWon(d){
  const nowMe=meFromState();
  if(d.winnerTeam!==null&&d.winnerTeam!==undefined)return nowMe?.team===d.winnerTeam;
@@ -1385,11 +1900,41 @@ document.getElementById("joinBtn").addEventListener("click",()=>socket.emit("joi
 document.querySelectorAll("[data-bot]").forEach(b=>b.addEventListener("click",()=>socket.emit("createBotRoom",{name:document.getElementById("botName").value,difficulty:b.dataset.bot})));
 document.getElementById("publicBtn").addEventListener("click",()=>socket.emit("joinPublicQueue",{name:document.getElementById("publicName").value}));
 document.getElementById("cancelMatch").addEventListener("click",()=>socket.emit("cancelPublicQueue"));
-document.getElementById("readyBtn").addEventListener("click",()=>{
+document.getElementById("readyBtn").addEventListener("click",e=>{
+ e.preventDefault();
+ e.stopPropagation();
  if(!state||!me||state.phase!=="lobby")return;
+ const btn=e.currentTarget;
+ btn.disabled=true;
  socket.emit("setReady",{ready:!me.ready});
+ setTimeout(()=>{if(state?.phase==="lobby")btn.disabled=false},350);
 });
 document.getElementById("closeInv").addEventListener("click",closeInventory);
+
+const fullscreenBtn=document.getElementById("fullscreenBtn");
+async function toggleFullscreen(){
+ try{
+  if(!document.fullscreenElement){
+   await document.documentElement.requestFullscreen?.();
+  }else{
+   await document.exitFullscreen?.();
+  }
+ }catch(_e){
+  showMessage("Schermo intero non disponibile in questo browser",1800);
+ }
+}
+fullscreenBtn.addEventListener("click",e=>{
+ e.preventDefault();
+ e.stopPropagation();
+ toggleFullscreen();
+});
+document.addEventListener("fullscreenchange",()=>{
+ fullscreenBtn.classList.toggle("active",!!document.fullscreenElement);
+ fullscreenBtn.textContent=document.fullscreenElement?"⛶":"⛶";
+ renderer.setSize(innerWidth,innerHeight);
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+});
 
 document.addEventListener("pointerlockchange",()=>{locked=document.pointerLockElement===renderer.domElement});
 document.addEventListener("mousemove",e=>{if(controlMode!=="pc"||!locked||!playing)return;local.yaw-=e.movementX*.00225;local.pitch=Math.max(-1.15,Math.min(1.15,local.pitch-e.movementY*.0019))});
@@ -1404,7 +1949,11 @@ document.addEventListener("keyup",e=>{if(controlMode==="pc")keys[e.code]=false})
 renderer.domElement.addEventListener("contextmenu",e=>e.preventDefault());
 renderer.domElement.addEventListener("mousedown",e=>{
  if(controlMode!=="pc"||!playing)return;
- if(!locked){renderer.domElement.requestPointerLock?.();return}
+ if(!locked){
+  document.getElementById("arenaEntryHint")?.classList.remove("show");
+  renderer.domElement.requestPointerLock?.();
+  return;
+ }
  if(e.button===0){
   if(me?.weapon==="bow"){
    if((me?.ammo||0)<=0){showMessage("Nessuna freccia",900);return}
