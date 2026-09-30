@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v2.9</title>
+<title>Pixel Knight RESTART v3.0</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -1041,6 +1041,25 @@ overflow:hidden}
   display:flex !important;
 }
 
+
+/* ===== v3.0 EFFETTO FANGO ===== */
+#mudBlind{
+  position:absolute;
+  inset:0;
+  z-index:90;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .12s ease;
+  background:
+    radial-gradient(circle at 18% 22%,rgba(28,12,4,.98) 0 8%,transparent 9%),
+    radial-gradient(circle at 72% 16%,rgba(55,26,8,.96) 0 12%,transparent 13%),
+    radial-gradient(circle at 45% 62%,rgba(37,17,5,.98) 0 20%,transparent 21%),
+    radial-gradient(circle at 84% 72%,rgba(77,37,10,.96) 0 15%,transparent 16%),
+    linear-gradient(rgba(75,37,12,.95),rgba(45,20,6,.97));
+  backdrop-filter:blur(2px);
+}
+#mudBlind.show{opacity:.96}
+
 </style>
 </head>
 <body>
@@ -1059,6 +1078,7 @@ overflow:hidden}
   <div id="bottom"><div class="card" id="weaponCard"><div class="small">EQUIPAGGIAMENTO</div><b id="weaponText">Spada</b><div class="ammo" id="ammoText"></div></div></div>
   <div id="help" class="card">W avanti · S indietro · A sinistra · D destra<br>SPAZIO salto · SHIFT corsa · Mouse guarda · CLICK SX attacco (con arco: tieni e rilascia)<br>CLICK DX scudo · I inventario · ESC libera mouse</div>
   <div id="damage"></div>
+  <div id="mudBlind" aria-hidden="true"></div>
   <button id="settingsBtn" class="card" type="button" aria-label="Impostazioni">⚙</button>
   <button id="fullscreenBtn" class="card" type="button" aria-label="Schermo intero" title="Schermo intero">⛶</button>
   <div id="arenaEntryHint">Clicca nell’arena per controllare il cavaliere • ⛶ per schermo intero</div>
@@ -1291,7 +1311,7 @@ const ui={
  score:document.getElementById("score"),hpFill:document.getElementById("hpFill"),hpText:document.getElementById("hpText"),
  stFill:document.getElementById("stFill"),stText:document.getElementById("stText"),center:document.getElementById("centerMsg"),
  weapon:document.getElementById("weaponText"),ammo:document.getElementById("ammoText"),block:document.getElementById("blockState"),
- damage:document.getElementById("damage"),cross:document.getElementById("cross"),damageNumbers:document.getElementById("damageNumbers")
+ damage:document.getElementById("damage"),cross:document.getElementById("cross"),damageNumbers:document.getElementById("damageNumbers"),mudBlind:document.getElementById("mudBlind")
 };
 
 const hubCards=[...document.querySelectorAll("#menu .hubCard")];
@@ -1311,9 +1331,11 @@ const MAP_INFO={
  forest:{name:"Rovine della Foresta",arena:18,obstacles:[{x:-5.5,z:-4,r:.95},{x:5,z:4.5,r:.95},{x:-4,z:6.2,r:.85},{x:6,z:-5.5,r:.85}]},
  colosseum:{name:"Colosseo delle Ceneri",arena:17,obstacles:[{x:-6.2,z:-6.2,r:.8},{x:6.2,z:-6.2,r:.8},{x:-6.2,z:6.2,r:.8},{x:6.2,z:6.2,r:.8}]}
 };
-const WEAPON_NAMES={sword:"⚔ Spada",dagger:"🗡 Pugnale",mace:"🔨 Mazza ferrata",greatsword:"⚔ Spadone",spear:"🔱 Lancia",axe:"🪓 Ascia da guerra",bow:"🏹 Arco"};
+const WEAPON_NAMES={sword:"⚔ Spada",dagger:"🗡 Pugnale",chainsaw:"🪚 Motosega",mud:"🟤 Sacca di fango",mace:"🔨 Mazza ferrata",greatsword:"⚔ Spadone",spear:"🔱 Lancia",axe:"🪓 Ascia da guerra",bow:"🏹 Arco"};
 const STORE=[
- {id:"dagger",name:"🗡 Pugnale",cost:45,desc:"Velocissimo: 18 danni, poca stamina e attacchi molto rapidi."},
+ {id:"dagger",name:"🗡 Pugnale",cost:45,desc:"Velocissimo ma leggero: 9 danni, poca stamina e attacchi molto rapidi."},
+ {id:"chainsaw",name:"🪚 Motosega",cost:130,desc:"Si accende e taglia davanti per 3,2 secondi. Poi deve ricaricarsi per 5 secondi."},
+ {id:"mud",name:"🟤 Sacca di fango",cost:70,desc:"Colpisci da vicino: oscura di marrone lo schermo dell’avversario per 5 secondi."},
  {id:"mace",name:"🔨 Mazza ferrata",cost:80,desc:"Pesante e solida: 34 danni con un buon arco di colpo."},
  {id:"greatsword",name:"⚔ Spadone",cost:110,desc:"Lento ma micidiale: 46 danni e portata superiore alla spada."},
  {id:"bow",name:"🏹 Arco lungo",cost:75,desc:"Arma a distanza potenziata: 32 danni + 8 frecce."},
@@ -1523,8 +1545,8 @@ function arm(x){
 }
 const leftHand=arm(-.32),rightHand=arm(.36);
 
-const swordGroup=new THREE.Group(),daggerGroup=new THREE.Group(),maceGroup=new THREE.Group(),greatswordGroup=new THREE.Group(),spearGroup=new THREE.Group(),axeGroup=new THREE.Group(),bowGroup=new THREE.Group(),shieldGroup=new THREE.Group();
-vm.add(swordGroup,daggerGroup,maceGroup,greatswordGroup,spearGroup,axeGroup,bowGroup,shieldGroup);
+const swordGroup=new THREE.Group(),daggerGroup=new THREE.Group(),chainsawGroup=new THREE.Group(),mudGroup=new THREE.Group(),maceGroup=new THREE.Group(),greatswordGroup=new THREE.Group(),spearGroup=new THREE.Group(),axeGroup=new THREE.Group(),bowGroup=new THREE.Group(),shieldGroup=new THREE.Group();
+vm.add(swordGroup,daggerGroup,chainsawGroup,mudGroup,maceGroup,greatswordGroup,spearGroup,axeGroup,bowGroup,shieldGroup);
 
 const matSteel=new THREE.MeshStandardMaterial({color:0xd5d8d6,roughness:.24,metalness:.92});
 const matDarkSteel=new THREE.MeshStandardMaterial({color:0x555b5e,roughness:.34,metalness:.84});
@@ -1533,6 +1555,8 @@ const matWood=new THREE.MeshStandardMaterial({color:0x654326,roughness:.82,metal
 const matLeather=new THREE.MeshStandardMaterial({color:0x3e2920,roughness:.94});
 const matShield=new THREE.MeshStandardMaterial({color:0x566773,roughness:.42,metalness:.68});
 const matShieldDark=new THREE.MeshStandardMaterial({color:0x30383d,roughness:.48,metalness:.72});
+const matMud=new THREE.MeshStandardMaterial({color:0x5b3217,roughness:1,metalness:0});
+const matChainsawRed=new THREE.MeshStandardMaterial({color:0x8a2f24,roughness:.55,metalness:.28});
 
 function cyl(r,h,mat,segments=12){
  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,segments),mat);m.castShadow=true;return m
@@ -1563,6 +1587,33 @@ function cone(r,h,mat,segments=8){
  const guard=boxMesh(.28,.045,.065,matGold);guard.position.z=-.02;daggerGroup.add(guard);
  const blade=boxMesh(.065,.022,.52,matSteel);blade.position.z=-.33;daggerGroup.add(blade);
  const tip=cone(.052,.17,matSteel,4);tip.rotation.x=-Math.PI/2;tip.rotation.z=Math.PI/4;tip.position.z=-.68;daggerGroup.add(tip);
+}
+
+
+// MOTOSEGA: corpo, doppia impugnatura e barra dentata.
+let chainsawChain=null;
+{
+ const body=boxMesh(.46,.30,.46,matChainsawRed);body.position.set(.04,0,.02);chainsawGroup.add(body);
+ const motor=boxMesh(.28,.22,.30,matDarkSteel);motor.position.set(.10,.02,.12);chainsawGroup.add(motor);
+ const grip=boxMesh(.42,.055,.07,matLeather);grip.position.set(.02,.25,.08);chainsawGroup.add(grip);
+ const rearGrip=boxMesh(.08,.30,.08,matLeather);rearGrip.position.set(.28,.05,.27);chainsawGroup.add(rearGrip);
+ const bar=boxMesh(.17,.055,1.18,matSteel);bar.position.set(-.02,0,-.78);chainsawGroup.add(bar);
+ const chain=new THREE.Group();
+ for(let i=0;i<12;i++){
+  const tooth=boxMesh(.21,.035,.045,matDarkSteel);
+  tooth.position.set(0,.045,-.28-i*.085);
+  chain.add(tooth);
+ }
+ chainsawGroup.add(chain);
+ chainsawChain=chain;
+}
+
+// SACCA DI FANGO: piccolo sacchetto marrone da colpire a distanza ravvicinata.
+{
+ const pouch=new THREE.Mesh(new THREE.SphereGeometry(.20,12,9),matMud);
+ pouch.scale.set(1.05,.82,.82);pouch.position.set(0,0,-.18);pouch.castShadow=true;mudGroup.add(pouch);
+ const neck=cyl(.055,.16,matLeather);neck.rotation.x=Math.PI/2;neck.position.z=.04;mudGroup.add(neck);
+ const tie=new THREE.Mesh(new THREE.TorusGeometry(.065,.015,6,12),matGold);tie.rotation.x=Math.PI/2;tie.position.z=-.01;mudGroup.add(tie);
 }
 
 // MAZZA FERRATA: manico corto e testa metallica pesante.
@@ -1675,6 +1726,8 @@ bowGroup.add(bowArrow);
 const weaponBase={
  sword:{pos:new THREE.Vector3(.38,-.25,-.86),rot:new THREE.Euler(.08,-.12,-.08)},
  dagger:{pos:new THREE.Vector3(.40,-.24,-.79),rot:new THREE.Euler(.10,-.12,-.10)},
+ chainsaw:{pos:new THREE.Vector3(.34,-.30,-.76),rot:new THREE.Euler(.03,-.05,-.05)},
+ mud:{pos:new THREE.Vector3(.40,-.25,-.73),rot:new THREE.Euler(.08,-.08,-.08)},
  mace:{pos:new THREE.Vector3(.39,-.30,-.78),rot:new THREE.Euler(.10,.01,-.13)},
  greatsword:{pos:new THREE.Vector3(.40,-.30,-.82),rot:new THREE.Euler(.08,-.06,-.12)},
  spear:{pos:new THREE.Vector3(.33,-.29,-.78),rot:new THREE.Euler(.02,-.04,0)},
@@ -1686,20 +1739,20 @@ const shieldHighPos=new THREE.Vector3(-.37,-.33,-.78);
 const shieldLowRot=new THREE.Euler(.10,-.10,-.18);
 const shieldHighRot=new THREE.Euler(.02,-.04,-.06);
 
-for(const [id,g] of Object.entries({sword:swordGroup,dagger:daggerGroup,mace:maceGroup,greatsword:greatswordGroup,spear:spearGroup,axe:axeGroup,bow:bowGroup})){
+for(const [id,g] of Object.entries({sword:swordGroup,dagger:daggerGroup,chainsaw:chainsawGroup,mud:mudGroup,mace:maceGroup,greatsword:greatswordGroup,spear:spearGroup,axe:axeGroup,bow:bowGroup})){
  g.position.copy(weaponBase[id].pos);g.rotation.copy(weaponBase[id].rot);
 }
 shieldGroup.position.copy(shieldLowPos);shieldGroup.rotation.copy(shieldLowRot);
 
 let bowDrawing=false,bowDraw=0,bowRelease=0;
-const ATTACK_DURATIONS={sword:.44,dagger:.24,mace:.50,greatsword:.68,spear:.36,axe:.58};
+const ATTACK_DURATIONS={sword:.44,dagger:.24,chainsaw:.18,mud:.34,mace:.50,greatsword:.68,spear:.36,axe:.58};
 function attackDuration(id){return ATTACK_DURATIONS[id]||.44}
 
 
 function setEquipment(){
  const w=me?.weapon||"sword";
- swordGroup.visible=w==="sword";daggerGroup.visible=w==="dagger";maceGroup.visible=w==="mace";greatswordGroup.visible=w==="greatsword";spearGroup.visible=w==="spear";axeGroup.visible=w==="axe";bowGroup.visible=w==="bow";
- shieldGroup.visible=!!me?.shieldEquipped&&w!=="bow";
+ swordGroup.visible=w==="sword";daggerGroup.visible=w==="dagger";chainsawGroup.visible=w==="chainsaw";mudGroup.visible=w==="mud";maceGroup.visible=w==="mace";greatswordGroup.visible=w==="greatsword";spearGroup.visible=w==="spear";axeGroup.visible=w==="axe";bowGroup.visible=w==="bow";
+ shieldGroup.visible=!!me?.shieldEquipped&&w!=="bow"&&w!=="chainsaw";
  if(me?.skin)gloveMat.color.setHex((SKINS[me.skin]||SKINS.crimson).color);
 }
 
@@ -1748,7 +1801,15 @@ function refreshHud(){
  ui.mapLabel.textContent=state?.mapName||"";
  ui.hpFill.style.width=me.hp+"%";ui.hpText.textContent=Math.round(me.hp);ui.stFill.style.width=me.stamina+"%";ui.stText.textContent=Math.round(me.stamina);
  ui.weapon.textContent=weaponName(me)+(me.shieldEquipped?" + 🛡":"");
- ui.ammo.textContent=me.weapon==="bow"?"Frecce: "+me.ammo:(me.shieldOwned?(me.shieldEquipped?"Scudo equipaggiato":"Scudo nello zaino"):"");
+ if(me.weapon==="bow"){
+  ui.ammo.textContent="Frecce: "+me.ammo;
+ }else if(me.weapon==="chainsaw"){
+  ui.ammo.textContent=me.chainsawActive
+   ?"MOTOSEGA ATTIVA"
+   :(me.chainsawRechargeMs>0?`Ricarica: ${(me.chainsawRechargeMs/1000).toFixed(1)}s`:"Carica pronta");
+ }else{
+  ui.ammo.textContent=me.shieldOwned?(me.shieldEquipped?"Scudo equipaggiato":"Scudo nello zaino"):"";
+ }
  ui.block.style.display=local.blocking&&me.shieldEquipped?"block":"none";
 
  if(state?.mode==="private"&&state?.privateFormat==="2v2"){
@@ -1804,7 +1865,7 @@ function renderStore(){
 }
 function renderWeaponSelector(targetId="weaponGrid"){
  const c=document.getElementById(targetId);c.innerHTML="";
- for(const id of ["sword","dagger","mace","greatsword","spear","axe","bow"]){
+ for(const id of ["sword","dagger","chainsaw","mud","mace","greatsword","spear","axe","bow"]){
   if(!me.owned?.[id])continue;
   const b=document.createElement("button");b.type="button";b.className=me.weapon===id?"selected":"";
   b.textContent=(me.weapon===id?"✓ ":"")+WEAPON_NAMES[id]+(id==="bow"?` (${me.ammo})`:"");
@@ -1816,8 +1877,8 @@ function renderShieldSelector(){
  const c=document.getElementById("shieldGrid");c.innerHTML="";
  if(!me.shieldOwned)return;
  const b=document.createElement("button");b.type="button";b.className=me.shieldEquipped?"selected":"";
- b.disabled=me.weapon==="bow";
- b.textContent=me.weapon==="bow"?"🛡 Scudo non utilizzabile con arco":(me.shieldEquipped?"✓ 🛡 Scudo equipaggiato":"🛡 Equipaggia scudo");
+ b.disabled=me.weapon==="bow"||me.weapon==="chainsaw";
+ b.textContent=(me.weapon==="bow"||me.weapon==="chainsaw")?"🛡 Scudo non utilizzabile con questa arma":(me.shieldEquipped?"✓ 🛡 Scudo equipaggiato":"🛡 Equipaggia scudo");
  b.addEventListener("click",()=>{socket.emit("toggleShield");flashSelection("Scudo aggiornato")});c.appendChild(b);
 }
 function refreshLobby(){
@@ -1845,7 +1906,7 @@ function refreshLobby(){
 }
 function refreshInventory(){
  const c=document.getElementById("invContent");if(!me)return;c.innerHTML="";
- for(const id of ["sword","dagger","mace","greatsword","spear","axe","bow"]){
+ for(const id of ["sword","dagger","chainsaw","mud","mace","greatsword","spear","axe","bow"]){
   if(!me.owned?.[id])continue;
   const b=document.createElement("button");b.type="button";b.className=me.weapon===id?"selected":"";
   b.textContent=(me.weapon===id?"✓ ":"")+WEAPON_NAMES[id]+(id==="bow"?` · ${me.ammo} frecce`:"");
@@ -1853,8 +1914,8 @@ function refreshInventory(){
  }
  if(me.shieldOwned){
   const b=document.createElement("button");b.type="button";b.className=me.shieldEquipped?"selected":"";
-  b.textContent=me.weapon==="bow"?"🛡 Scudo non disponibile con arco":(me.shieldEquipped?"✓ 🛡 Scudo":"🛡 Equipaggia scudo");
-  b.disabled=me.weapon==="bow";b.addEventListener("click",()=>socket.emit("toggleShield"));c.appendChild(b);
+  b.textContent=(me.weapon==="bow"||me.weapon==="chainsaw")?"🛡 Scudo non disponibile con questa arma":(me.shieldEquipped?"✓ 🛡 Scudo":"🛡 Equipaggia scudo");
+  b.disabled=me.weapon==="bow"||me.weapon==="chainsaw";b.addEventListener("click",()=>socket.emit("toggleShield"));c.appendChild(b);
  }
 }
 function showMessage(t,ms=1500){ui.center.textContent=t;setTimeout(()=>{if(ui.center.textContent===t)ui.center.textContent=""},ms)}
@@ -1946,9 +2007,29 @@ socket.on("roundEnd",d=>showMessage(mySideWon(d)?"ROUND VINTO":"ROUND FINITO",26
 socket.on("matchEnd",d=>{showMessage(mySideWon(d)?"HAI VINTO IL DUELLO":"DUELLO FINITO",5000);setTimeout(()=>{document.exitPointerLock?.();playing=false;lobby.classList.add("show")},5600)});
 socket.on("opponentLeft",()=>{showMessage("Un giocatore si è disconnesso",3000);lobby.classList.add("show");playing=false;setMobileControlsVisible()});
 socket.on("noAmmo",()=>showMessage("Nessuna freccia",900));
+let mudBlindTimer=null;
+function triggerMudBlind(ms=5000){
+ clearTimeout(mudBlindTimer);
+ ui.mudBlind.classList.add("show");
+ mudBlindTimer=setTimeout(()=>ui.mudBlind.classList.remove("show"),ms);
+}
+
 socket.on("combatEvent",e=>{
- if(e.target===myId){if(e.type==="hit"){hitFlash=.22;ui.damage.style.opacity=".76"}if(e.type==="block")showMessage("PARATA",500)}
- if(e.attacker===myId&&(e.type==="hit"||e.type==="block"))showDamageNumber(e.damage,e.type==="block",e.source==="axe",e.target);
+ if(e.type==="mudBlind"&&e.target===myId){
+  triggerMudBlind(e.duration||5000);
+  showMessage("FANGO! Visione oscurata",900);
+  return;
+ }
+ if(e.target===myId){
+  if(e.type==="hit"){hitFlash=.22;ui.damage.style.opacity=".76"}
+  if(e.type==="block")showMessage("PARATA",500);
+ }
+ if(e.attacker===myId&&(e.type==="hit"||e.type==="block")){
+  showDamageNumber(e.damage,e.type==="block",e.source==="axe"||e.source==="greatsword",e.target);
+ }
+});
+socket.on("chainsawRecharge",d=>{
+ showMessage(`Motosega in ricarica: ${Math.ceil((d?.ms||0)/1000)}s`,1100);
 });
 
 document.querySelectorAll("[data-private-format]").forEach(b=>b.addEventListener("click",()=>socket.emit("createRoom",{name:document.getElementById("createName").value,format:b.dataset.privateFormat})));
@@ -2020,7 +2101,7 @@ renderer.domElement.addEventListener("mousedown",e=>{
   }
  }
  if(e.button===2){
-  if(!me?.shieldOwned||!me?.shieldEquipped||me?.weapon==="bow"){showMessage("Equipaggia uno scudo per parare",950);return}
+  if(!me?.shieldOwned||!me?.shieldEquipped||me?.weapon==="bow"||me?.weapon==="chainsaw"){showMessage("Con questa arma non puoi usare lo scudo",950);return}
   local.blocking=true;
  }
 });
@@ -2092,7 +2173,7 @@ attackBtn.addEventListener("pointercancel",releaseMobileAttack);
 const blockBtn=document.getElementById("blockBtn");
 blockBtn.addEventListener("pointerdown",e=>{
  if(controlMode!=="mobile"||!playing)return;e.preventDefault();mobileBlockPointer=e.pointerId;blockBtn.setPointerCapture?.(e.pointerId);
- if(!me?.shieldOwned||!me?.shieldEquipped||me?.weapon==="bow"){showMessage("Equipaggia uno scudo per parare",950);return}
+ if(!me?.shieldOwned||!me?.shieldEquipped||me?.weapon==="bow"||me?.weapon==="chainsaw"){showMessage("Con questa arma non puoi usare lo scudo",950);return}
  local.blocking=true;
 });
 function releaseMobileBlock(e){if(e.pointerId===mobileBlockPointer){mobileBlockPointer=null;local.blocking=false}}
@@ -2164,7 +2245,7 @@ function resetHandPose(hand,amount){
  lerpEuler(hand.glove,hand.gloveRot,amount);
 }
 function animateWeapons(dt){
- const groups={sword:swordGroup,dagger:daggerGroup,mace:maceGroup,greatsword:greatswordGroup,spear:spearGroup,axe:axeGroup,bow:bowGroup};
+ const groups={sword:swordGroup,dagger:daggerGroup,chainsaw:chainsawGroup,mud:mudGroup,mace:maceGroup,greatsword:greatswordGroup,spear:spearGroup,axe:axeGroup,bow:bowGroup};
  const currentId=me?.weapon||"sword";
  const current=groups[currentId];
  const settle=Math.min(1,dt*13);
@@ -2175,6 +2256,15 @@ function animateWeapons(dt){
  }
  resetHandPose(leftHand,settle);
  resetHandPose(rightHand,settle);
+
+ if(currentId==="chainsaw"&&me?.chainsawActive){
+  const t=performance.now()*.06;
+  current.position.x=weaponBase.chainsaw.pos.x+Math.sin(t)*.012;
+  current.position.y=weaponBase.chainsaw.pos.y+Math.cos(t*1.31)*.010;
+  current.position.z=weaponBase.chainsaw.pos.z-.12;
+  current.rotation.z=weaponBase.chainsaw.rot.z+Math.sin(t*.72)*.025;
+  if(chainsawChain)chainsawChain.position.z=(Math.sin(t*2)*.018);
+ }
 
  // Lo scudo resta basso a sinistra e si alza solo quanto basta per parare.
  const shieldTargetPos=local.blocking?shieldHighPos:shieldLowPos;
@@ -2198,6 +2288,15 @@ function animateWeapons(dt){
    const thrust=Math.sin(Math.PI*p);
    current.position.z=weaponBase.spear.pos.z-thrust*.92;
    current.position.y=weaponBase.spear.pos.y+thrust*.035;
+  }else if(currentId==="chainsaw"){
+   const shove=Math.sin(Math.PI*p);
+   current.position.z=weaponBase.chainsaw.pos.z-shove*.28;
+   current.rotation.x=weaponBase.chainsaw.rot.x-shove*.08;
+  }else if(currentId==="mud"){
+   const jab=Math.sin(Math.PI*p);
+   current.position.z=weaponBase.mud.pos.z-jab*.58;
+   current.position.y=weaponBase.mud.pos.y+jab*.04;
+   current.rotation.z=weaponBase.mud.rot.z-jab*.26;
   }else if(currentId==="dagger"){
    const stab=Math.sin(Math.PI*p);
    current.position.z=weaponBase.dagger.pos.z-stab*.60;
