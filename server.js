@@ -60,11 +60,28 @@ const MAPS = {
 
 const WEAPONS = {
   sword: { name: "Spada", type: "melee", damage: 28, reach: 3.35, width: 0.95, cooldown: 500, stamina: 17 },
+
+  // Nuove armi: ognuna ha un ritmo diverso.
+  dagger: { name: "Pugnale", type: "melee", damage: 18, reach: 2.35, width: 1.08, cooldown: 280, stamina: 9 },
+  mace: { name: "Mazza ferrata", type: "melee", damage: 34, reach: 3.05, width: 1.02, cooldown: 690, stamina: 22 },
+  greatsword: { name: "Spadone", type: "melee", damage: 46, reach: 3.75, width: 1.03, cooldown: 980, stamina: 31 },
+
   spear: { name: "Lancia", type: "melee", damage: 24, reach: 4.65, width: 0.72, cooldown: 650, stamina: 20 },
   axe: { name: "Ascia da guerra", type: "melee", damage: 40, reach: 2.85, width: 1.02, cooldown: 820, stamina: 27 },
-  bow: { name: "Arco", type: "bow", damage: 22, cooldown: 800, stamina: 12 }
+
+  // Arco potenziato: prima faceva 22 danni.
+  bow: { name: "Arco", type: "bow", damage: 32, cooldown: 800, stamina: 12 }
 };
-const PRICES = { bow: 75, arrows: 20, spear: 65, axe: 85, shield: 120 };
+const PRICES = {
+  dagger: 45,
+  mace: 80,
+  greatsword: 110,
+  bow: 75,
+  arrows: 20,
+  spear: 65,
+  axe: 85,
+  shield: 120
+};
 const SKINS = new Set(["crimson", "azure", "emerald", "obsidian"]);
 const BOT_LEVELS = {
   easy:   { name: "Bot Facile", speed: 2.65, think: 850, aimError: 0.22, attackDelay: 260, blockChance: 0.00, weapon: "sword", skin: "emerald" },
@@ -174,7 +191,7 @@ function createPlayer(id, name, room, index) {
     id, name: sanitizeName(name),
     x: s.x, y: 0, z: s.z, yaw: s.yaw, pitch: 0,
     hp: 100, stamina: 100, weapon: "sword",
-    owned: { sword: true, spear: false, axe: false, bow: false },
+    owned: { sword: true, dagger: false, mace: false, greatsword: false, spear: false, axe: false, bow: false },
     shieldOwned: false, shieldEquipped: false, blocking: false,
     ammo: 0, coins: 220, score: 0, ready: false,
     attackAt: 0, lastMoveAt: Date.now(), skin: "crimson",
@@ -191,7 +208,7 @@ function createBot(room, difficulty, index) {
   p.team = 1;
   p.skin = cfg.skin;
   p.weapon = cfg.weapon;
-  p.owned = { sword: true, spear: true, axe: true, bow: true };
+  p.owned = { sword: true, dagger: true, mace: true, greatsword: true, spear: true, axe: true, bow: true };
   p.shieldOwned = difficulty !== "easy";
   p.shieldEquipped = difficulty === "hard";
   p.coins = 0;
