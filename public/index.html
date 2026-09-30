@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v2.8</title>
+<title>Pixel Knight RESTART v2.9</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -1311,13 +1311,16 @@ const MAP_INFO={
  forest:{name:"Rovine della Foresta",arena:18,obstacles:[{x:-5.5,z:-4,r:.95},{x:5,z:4.5,r:.95},{x:-4,z:6.2,r:.85},{x:6,z:-5.5,r:.85}]},
  colosseum:{name:"Colosseo delle Ceneri",arena:17,obstacles:[{x:-6.2,z:-6.2,r:.8},{x:6.2,z:-6.2,r:.8},{x:-6.2,z:6.2,r:.8},{x:6.2,z:6.2,r:.8}]}
 };
-const WEAPON_NAMES={sword:"⚔ Spada",spear:"🔱 Lancia",axe:"🪓 Ascia da guerra",bow:"🏹 Arco"};
+const WEAPON_NAMES={sword:"⚔ Spada",dagger:"🗡 Pugnale",mace:"🔨 Mazza ferrata",greatsword:"⚔ Spadone",spear:"🔱 Lancia",axe:"🪓 Ascia da guerra",bow:"🏹 Arco"};
 const STORE=[
- {id:"bow",name:"🏹 Arco lungo",cost:75,desc:"Arma a distanza + 8 frecce."},
+ {id:"dagger",name:"🗡 Pugnale",cost:45,desc:"Velocissimo: 18 danni, poca stamina e attacchi molto rapidi."},
+ {id:"mace",name:"🔨 Mazza ferrata",cost:80,desc:"Pesante e solida: 34 danni con un buon arco di colpo."},
+ {id:"greatsword",name:"⚔ Spadone",cost:110,desc:"Lento ma micidiale: 46 danni e portata superiore alla spada."},
+ {id:"bow",name:"🏹 Arco lungo",cost:75,desc:"Arma a distanza potenziata: 32 danni + 8 frecce."},
  {id:"arrows",name:"➶ 12 frecce",cost:20,desc:"Munizioni aggiuntive per l'arco."},
- {id:"spear",name:"🔱 Lancia",cost:65,desc:"Portata maggiore, 24 danni."},
+ {id:"spear",name:"🔱 Lancia",cost:65,desc:"Portata maggiore: 24 danni."},
  {id:"axe",name:"🪓 Ascia da guerra",cost:85,desc:"Lenta ma devastante: 40 danni."},
- {id:"shield",name:"🛡 Scudo reale",cost:120,desc:"Costoso, ma permette di parare con click destro."}
+ {id:"shield",name:"🛡 Scudo reale",cost:120,desc:"Permette di parare con click destro."}
 ];
 const SKINS={
  crimson:{name:"Cavaliere Cremisi",color:0x6f3436,css:"#6f3436"},
@@ -1520,8 +1523,8 @@ function arm(x){
 }
 const leftHand=arm(-.32),rightHand=arm(.36);
 
-const swordGroup=new THREE.Group(),spearGroup=new THREE.Group(),axeGroup=new THREE.Group(),bowGroup=new THREE.Group(),shieldGroup=new THREE.Group();
-vm.add(swordGroup,spearGroup,axeGroup,bowGroup,shieldGroup);
+const swordGroup=new THREE.Group(),daggerGroup=new THREE.Group(),maceGroup=new THREE.Group(),greatswordGroup=new THREE.Group(),spearGroup=new THREE.Group(),axeGroup=new THREE.Group(),bowGroup=new THREE.Group(),shieldGroup=new THREE.Group();
+vm.add(swordGroup,daggerGroup,maceGroup,greatswordGroup,spearGroup,axeGroup,bowGroup,shieldGroup);
 
 const matSteel=new THREE.MeshStandardMaterial({color:0xd5d8d6,roughness:.24,metalness:.92});
 const matDarkSteel=new THREE.MeshStandardMaterial({color:0x555b5e,roughness:.34,metalness:.84});
@@ -1550,6 +1553,42 @@ function cone(r,h,mat,segments=8){
  const blade=boxMesh(.078,.026,1.02,matSteel);blade.position.z=-.62;swordGroup.add(blade);
  const fuller=boxMesh(.018,.029,.76,matDarkSteel);fuller.position.z=-.56;swordGroup.add(fuller);
  const tip=cone(.058,.22,matSteel,4);tip.rotation.x=-Math.PI/2;tip.rotation.z=Math.PI/4;tip.position.z=-1.24;swordGroup.add(tip);
+}
+
+
+// PUGNALE: corto, leggero e molto rapido.
+{
+ const grip=cyl(.038,.25,matLeather);grip.rotation.x=Math.PI/2;grip.position.z=.13;daggerGroup.add(grip);
+ const pommel=new THREE.Mesh(new THREE.SphereGeometry(.055,9,7),matGold);pommel.position.z=.28;daggerGroup.add(pommel);
+ const guard=boxMesh(.28,.045,.065,matGold);guard.position.z=-.02;daggerGroup.add(guard);
+ const blade=boxMesh(.065,.022,.52,matSteel);blade.position.z=-.33;daggerGroup.add(blade);
+ const tip=cone(.052,.17,matSteel,4);tip.rotation.x=-Math.PI/2;tip.rotation.z=Math.PI/4;tip.position.z=-.68;daggerGroup.add(tip);
+}
+
+// MAZZA FERRATA: manico corto e testa metallica pesante.
+{
+ const handle=cyl(.045,.72,matWood);handle.rotation.x=Math.PI/2;handle.position.z=.08;maceGroup.add(handle);
+ const wrap=cyl(.055,.23,matLeather);wrap.rotation.x=Math.PI/2;wrap.position.z=.34;maceGroup.add(wrap);
+ const collar=cyl(.068,.12,matGold);collar.rotation.x=Math.PI/2;collar.position.z=-.31;maceGroup.add(collar);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.19,10,8),matDarkSteel);head.position.z=-.53;head.castShadow=true;maceGroup.add(head);
+ for(let i=0;i<8;i++){
+  const a=i/8*Math.PI*2;
+  const spike=cone(.045,.16,matSteel,5);
+  spike.rotation.z=Math.PI/2;
+  spike.rotation.y=a;
+  spike.position.set(Math.cos(a)*.20,Math.sin(a)*.20,-.53);
+  maceGroup.add(spike);
+ }
+}
+
+// SPADONE: lama lunga e larga, molto più pesante della spada base.
+{
+ const grip=cyl(.05,.43,matLeather);grip.rotation.x=Math.PI/2;grip.position.z=.22;greatswordGroup.add(grip);
+ const pommel=new THREE.Mesh(new THREE.SphereGeometry(.082,10,8),matGold);pommel.position.z=.45;greatswordGroup.add(pommel);
+ const guard=boxMesh(.68,.065,.085,matGold);guard.position.z=-.04;greatswordGroup.add(guard);
+ const blade=boxMesh(.115,.034,1.36,matSteel);blade.position.z=-.78;greatswordGroup.add(blade);
+ const fuller=boxMesh(.024,.038,1.05,matDarkSteel);fuller.position.z=-.70;greatswordGroup.add(fuller);
+ const tip=cone(.083,.28,matSteel,4);tip.rotation.x=-Math.PI/2;tip.rotation.z=Math.PI/4;tip.position.z=-1.60;greatswordGroup.add(tip);
 }
 
 // LANCIA: asta lignea, collare e punta più lunga.
@@ -1635,6 +1674,9 @@ bowGroup.add(bowArrow);
 
 const weaponBase={
  sword:{pos:new THREE.Vector3(.38,-.25,-.86),rot:new THREE.Euler(.08,-.12,-.08)},
+ dagger:{pos:new THREE.Vector3(.40,-.24,-.79),rot:new THREE.Euler(.10,-.12,-.10)},
+ mace:{pos:new THREE.Vector3(.39,-.30,-.78),rot:new THREE.Euler(.10,.01,-.13)},
+ greatsword:{pos:new THREE.Vector3(.40,-.30,-.82),rot:new THREE.Euler(.08,-.06,-.12)},
  spear:{pos:new THREE.Vector3(.33,-.29,-.78),rot:new THREE.Euler(.02,-.04,0)},
  axe:{pos:new THREE.Vector3(.39,-.31,-.78),rot:new THREE.Euler(.10,.02,-.16)},
  bow:{pos:new THREE.Vector3(.35,-.08,-.83),rot:new THREE.Euler(.02,-.14,.04)}
@@ -1644,16 +1686,19 @@ const shieldHighPos=new THREE.Vector3(-.37,-.33,-.78);
 const shieldLowRot=new THREE.Euler(.10,-.10,-.18);
 const shieldHighRot=new THREE.Euler(.02,-.04,-.06);
 
-for(const [id,g] of Object.entries({sword:swordGroup,spear:spearGroup,axe:axeGroup,bow:bowGroup})){
+for(const [id,g] of Object.entries({sword:swordGroup,dagger:daggerGroup,mace:maceGroup,greatsword:greatswordGroup,spear:spearGroup,axe:axeGroup,bow:bowGroup})){
  g.position.copy(weaponBase[id].pos);g.rotation.copy(weaponBase[id].rot);
 }
 shieldGroup.position.copy(shieldLowPos);shieldGroup.rotation.copy(shieldLowRot);
 
 let bowDrawing=false,bowDraw=0,bowRelease=0;
+const ATTACK_DURATIONS={sword:.44,dagger:.24,mace:.50,greatsword:.68,spear:.36,axe:.58};
+function attackDuration(id){return ATTACK_DURATIONS[id]||.44}
+
 
 function setEquipment(){
  const w=me?.weapon||"sword";
- swordGroup.visible=w==="sword";spearGroup.visible=w==="spear";axeGroup.visible=w==="axe";bowGroup.visible=w==="bow";
+ swordGroup.visible=w==="sword";daggerGroup.visible=w==="dagger";maceGroup.visible=w==="mace";greatswordGroup.visible=w==="greatsword";spearGroup.visible=w==="spear";axeGroup.visible=w==="axe";bowGroup.visible=w==="bow";
  shieldGroup.visible=!!me?.shieldEquipped&&w!=="bow";
  if(me?.skin)gloveMat.color.setHex((SKINS[me.skin]||SKINS.crimson).color);
 }
@@ -1759,7 +1804,7 @@ function renderStore(){
 }
 function renderWeaponSelector(targetId="weaponGrid"){
  const c=document.getElementById(targetId);c.innerHTML="";
- for(const id of ["sword","spear","axe","bow"]){
+ for(const id of ["sword","dagger","mace","greatsword","spear","axe","bow"]){
   if(!me.owned?.[id])continue;
   const b=document.createElement("button");b.type="button";b.className=me.weapon===id?"selected":"";
   b.textContent=(me.weapon===id?"✓ ":"")+WEAPON_NAMES[id]+(id==="bow"?` (${me.ammo})`:"");
@@ -1800,7 +1845,7 @@ function refreshLobby(){
 }
 function refreshInventory(){
  const c=document.getElementById("invContent");if(!me)return;c.innerHTML="";
- for(const id of ["sword","spear","axe","bow"]){
+ for(const id of ["sword","dagger","mace","greatsword","spear","axe","bow"]){
   if(!me.owned?.[id])continue;
   const b=document.createElement("button");b.type="button";b.className=me.weapon===id?"selected":"";
   b.textContent=(me.weapon===id?"✓ ":"")+WEAPON_NAMES[id]+(id==="bow"?` · ${me.ammo} frecce`:"");
@@ -1971,7 +2016,7 @@ renderer.domElement.addEventListener("mousedown",e=>{
    bowDrawing=true;
   }else{
    socket.emit("attack");
-   attackAnim=me?.weapon==="axe"?.58:(me?.weapon==="spear"?.36:.44);
+   attackAnim=attackDuration(me?.weapon);
   }
  }
  if(e.button===2){
@@ -2033,7 +2078,7 @@ attackBtn.addEventListener("pointerdown",e=>{
   bowDrawing=true;
  }else{
   socket.emit("attack");
-  attackAnim=me?.weapon==="axe"?.58:(me?.weapon==="spear"?.36:.44);
+  attackAnim=attackDuration(me?.weapon);
  }
 });
 function releaseMobileAttack(e){
@@ -2119,7 +2164,7 @@ function resetHandPose(hand,amount){
  lerpEuler(hand.glove,hand.gloveRot,amount);
 }
 function animateWeapons(dt){
- const groups={sword:swordGroup,spear:spearGroup,axe:axeGroup,bow:bowGroup};
+ const groups={sword:swordGroup,dagger:daggerGroup,mace:maceGroup,greatsword:greatswordGroup,spear:spearGroup,axe:axeGroup,bow:bowGroup};
  const currentId=me?.weapon||"sword";
  const current=groups[currentId];
  const settle=Math.min(1,dt*13);
@@ -2145,7 +2190,7 @@ function animateWeapons(dt){
  }
 
  if(attackAnim>0&&current&&currentId!=="bow"){
-  const total=currentId==="axe"?.58:(currentId==="spear"?.36:.44);
+  const total=attackDuration(currentId);
   attackAnim=Math.max(0,attackAnim-dt);
   const p=1-attackAnim/total;
 
@@ -2153,6 +2198,25 @@ function animateWeapons(dt){
    const thrust=Math.sin(Math.PI*p);
    current.position.z=weaponBase.spear.pos.z-thrust*.92;
    current.position.y=weaponBase.spear.pos.y+thrust*.035;
+  }else if(currentId==="dagger"){
+   const stab=Math.sin(Math.PI*p);
+   current.position.z=weaponBase.dagger.pos.z-stab*.60;
+   current.position.x=weaponBase.dagger.pos.x-stab*.08;
+   current.rotation.x=weaponBase.dagger.rot.x-stab*.18;
+   current.rotation.z=weaponBase.dagger.rot.z-stab*.42;
+  }else if(currentId==="mace"){
+   const hit=Math.sin(Math.PI*p);
+   current.position.y=weaponBase.mace.pos.y+.18*hit;
+   current.position.z=weaponBase.mace.pos.z-.34*hit;
+   current.rotation.x=weaponBase.mace.rot.x+.92*hit;
+   current.rotation.z=weaponBase.mace.rot.z-.62*hit;
+  }else if(currentId==="greatsword"){
+   const sweep=Math.sin(Math.PI*p);
+   current.position.x=weaponBase.greatsword.pos.x-.18*sweep;
+   current.position.z=weaponBase.greatsword.pos.z-.36*sweep;
+   current.rotation.x=weaponBase.greatsword.rot.x-.58*sweep;
+   current.rotation.z=weaponBase.greatsword.rot.z-1.22*sweep;
+   current.rotation.y=weaponBase.greatsword.rot.y+.28*sweep;
   }else if(currentId==="axe"){
    // Movimento in due fasi: caricamento alto a destra, poi colpo secco in avanti e verso il basso.
    const windEnd=.30;
