@@ -65,7 +65,7 @@ const WEAPONS = {
   dagger: { name: "Pugnale", type: "melee", damage: 9, reach: 2.35, width: 1.08, cooldown: 280, stamina: 9 },
   mace: { name: "Mazza ferrata", type: "melee", damage: 34, reach: 3.05, width: 1.02, cooldown: 690, stamina: 22 },
   greatsword: { name: "Spadone", type: "melee", damage: 46, reach: 3.75, width: 1.03, cooldown: 980, stamina: 31 },
-  chainsaw: { name: "Motosega", type: "chainsaw", damage: 5, reach: 2.85, width: 0.72, cooldown: 0, stamina: 0 },
+  chainsaw: { name: "Motosega", type: "chainsaw", damage: 9, reach: 2.85, width: 0.72, cooldown: 0, stamina: 0 },
   mud: { name: "Sacca di fango", type: "mud", damage: 2, reach: 2.45, width: 0.82, cooldown: 850, stamina: 7 },
 
   spear: { name: "Lancia", type: "melee", damage: 24, reach: 4.65, width: 0.72, cooldown: 650, stamina: 20 },
@@ -197,7 +197,7 @@ function createPlayer(id, name, room, index) {
     id, name: sanitizeName(name),
     x: s.x, y: 0, z: s.z, yaw: s.yaw, pitch: 0,
     hp: 100, stamina: 100, weapon: "sword",
-    owned: { sword: true, dagger: false, chainsaw: false, mud: false, mace: false, greatsword: false, spear: false, axe: false, bow: false },
+    owned: freshOwnedWeapons(),
     shieldOwned: false, shieldEquipped: false, blocking: false,
     ammo: 0, coins: 220, score: 0, ready: false,
     attackAt: 0, lastMoveAt: Date.now(), skin: "crimson",
@@ -206,6 +206,53 @@ function createPlayer(id, name, room, index) {
     team: teamForIndex(room, index),
     isBot: false, botDifficulty: null
   };
+}
+
+
+function freshOwnedWeapons() {
+  return {
+    sword: true,
+    dagger: false,
+    chainsaw: false,
+    mud: false,
+    mace: false,
+    greatsword: false,
+    spear: false,
+    axe: false,
+    bow: false
+  };
+}
+
+function resetHumanLoadoutAfterMatch(p) {
+  p.coins = 220;
+  p.weapon = "sword";
+  p.owned = freshOwnedWeapons();
+  p.shieldOwned = false;
+  p.shieldEquipped = false;
+  p.ammo = 0;
+  p.blocking = false;
+  p.chainsawActiveUntil = 0;
+  p.chainsawRechargeUntil = 0;
+  p.chainsawNextHitAt = 0;
+  p.blindedUntil = 0;
+}
+
+function resetBotLoadoutAfterMatch(p) {
+  const cfg = BOT_LEVELS[p.botDifficulty] || BOT_LEVELS.easy;
+  p.weapon = cfg.weapon;
+  p.owned = {
+    sword: true, dagger: true, chainsaw: true, mud: true,
+    mace: true, greatsword: true, spear: true, axe: true, bow: true
+  };
+  p.shieldOwned = p.botDifficulty !== "easy";
+  p.shieldEquipped = p.botDifficulty === "hard";
+  p.coins = 0;
+  p.ammo = 99;
+  p.blocking = false;
+  p.chainsawActiveUntil = 0;
+  p.chainsawRechargeUntil = 0;
+  p.chainsawNextHitAt = 0;
+  p.blindedUntil = 0;
 }
 
 function createBot(room, difficulty, index) {
@@ -300,7 +347,16 @@ function finishRound(room, winner, winnerTeam = null) {
     setTimeout(() => {
       if (!rooms.has(room.code)) return;
       room.players.forEach(p => {
-        p.score = 0; p.ready = p.isBot; p.hp = 100; p.stamina = 100; p.blocking = false;
+        p.score = 0;
+        p.ready = p.isBot;
+        p.hp = 100;
+        p.stamina = 100;
+        p.blocking = false;
+
+        // Ogni nuova partita riparte economicamente da zero acquisti:
+        // 220 monete, sola spada base, niente scudo/frecce/armi comprate.
+        if (p.isBot) resetBotLoadoutAfterMatch(p);
+        else resetHumanLoadoutAfterMatch(p);
       });
       room.phase = "lobby"; room.message = "";
       emitRoom(room);
