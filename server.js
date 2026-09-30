@@ -62,9 +62,11 @@ const WEAPONS = {
   sword: { name: "Spada", type: "melee", damage: 28, reach: 3.35, width: 0.95, cooldown: 500, stamina: 17 },
 
   // Nuove armi: ognuna ha un ritmo diverso.
-  dagger: { name: "Pugnale", type: "melee", damage: 18, reach: 2.35, width: 1.08, cooldown: 280, stamina: 9 },
+  dagger: { name: "Pugnale", type: "melee", damage: 9, reach: 2.35, width: 1.08, cooldown: 280, stamina: 9 },
   mace: { name: "Mazza ferrata", type: "melee", damage: 34, reach: 3.05, width: 1.02, cooldown: 690, stamina: 22 },
   greatsword: { name: "Spadone", type: "melee", damage: 46, reach: 3.75, width: 1.03, cooldown: 980, stamina: 31 },
+  chainsaw: { name: "Motosega", type: "chainsaw", damage: 5, reach: 2.85, width: 0.72, cooldown: 0, stamina: 0 },
+  mud: { name: "Sacca di fango", type: "mud", damage: 2, reach: 2.45, width: 0.82, cooldown: 850, stamina: 7 },
 
   spear: { name: "Lancia", type: "melee", damage: 24, reach: 4.65, width: 0.72, cooldown: 650, stamina: 20 },
   axe: { name: "Ascia da guerra", type: "melee", damage: 40, reach: 2.85, width: 1.02, cooldown: 820, stamina: 27 },
@@ -74,6 +76,8 @@ const WEAPONS = {
 };
 const PRICES = {
   dagger: 45,
+  chainsaw: 130,
+  mud: 70,
   mace: 80,
   greatsword: 110,
   bow: 75,
@@ -129,7 +133,9 @@ function playerPublic(p) {
     ammo: p.ammo, coins: p.coins, score: p.score, ready: p.ready,
     owned: p.owned, shieldOwned: p.shieldOwned, shieldEquipped: p.shieldEquipped,
     skin: p.skin, isBot: !!p.isBot, botDifficulty: p.botDifficulty || null,
-    team: p.team, alive: p.hp > 0
+    team: p.team, alive: p.hp > 0,
+    chainsawActive: Date.now() < (p.chainsawActiveUntil || 0),
+    chainsawRechargeMs: Math.max(0, (p.chainsawRechargeUntil || 0) - Date.now())
   };
 }
 function roomPublic(room) {
@@ -191,10 +197,12 @@ function createPlayer(id, name, room, index) {
     id, name: sanitizeName(name),
     x: s.x, y: 0, z: s.z, yaw: s.yaw, pitch: 0,
     hp: 100, stamina: 100, weapon: "sword",
-    owned: { sword: true, dagger: false, mace: false, greatsword: false, spear: false, axe: false, bow: false },
+    owned: { sword: true, dagger: false, chainsaw: false, mud: false, mace: false, greatsword: false, spear: false, axe: false, bow: false },
     shieldOwned: false, shieldEquipped: false, blocking: false,
     ammo: 0, coins: 220, score: 0, ready: false,
     attackAt: 0, lastMoveAt: Date.now(), skin: "crimson",
+    chainsawActiveUntil: 0, chainsawRechargeUntil: 0, chainsawNextHitAt: 0,
+    blindedUntil: 0,
     team: teamForIndex(room, index),
     isBot: false, botDifficulty: null
   };
@@ -208,7 +216,7 @@ function createBot(room, difficulty, index) {
   p.team = 1;
   p.skin = cfg.skin;
   p.weapon = cfg.weapon;
-  p.owned = { sword: true, dagger: true, mace: true, greatsword: true, spear: true, axe: true, bow: true };
+  p.owned = { sword: true, dagger: true, chainsaw: true, mud: true, mace: true, greatsword: true, spear: true, axe: true, bow: true };
   p.shieldOwned = difficulty !== "easy";
   p.shieldEquipped = difficulty === "hard";
   p.coins = 0;
@@ -231,6 +239,7 @@ function resetRound(room) {
     p.x = s.x; p.y = 0; p.z = s.z; p.yaw = s.yaw; p.pitch = 0;
     p.hp = 100; p.stamina = 100; p.blocking = false;
     p.attackAt = 0; p.lastMoveAt = Date.now();
+    p.chainsawActiveUntil = 0; p.chainsawRechargeUntil = 0; p.chainsawNextHitAt = 0; p.blindedUntil = 0;
     if (p.weapon === "bow" && p.ammo < 6) p.ammo = 6;
     if (p.isBot && p.bot) {
       p.bot.nextThink = 0; p.bot.nextGuard = 0; p.bot.guardUntil = 0; p.bot.attackReadyAt = Date.now() + 500;
@@ -368,12 +377,34 @@ function applyDamage(room, attacker, target, damage, source) {
     target.blocking = false;
     checkRoundOutcome(room);
   }
+  return { blocked, dealt };
 }
 
 function performAttack(room, p, noAmmoSocket = null) {
   if (!room || room.phase !== "active" || !p || p.hp <= 0 || p.blocking) return false;
   const w = WEAPONS[p.weapon] || WEAPONS.sword;
   const now = Date.now();
+
+  // Motosega: un click la accende per 3.2 secondi.
+  // Poi la batteria/motore deve raffreddarsi per 5 secondi.
+  if (w.type === "chainsaw") {
+    if (now < (p.chainsawActiveUntil || 0)) return false;
+    if (now < (p.chainsawRechargeUntil || 0)) {
+      if (noAmmoSocket) noAmmoSocket.emit("chainsawRecharge", {
+        ms: Math.max(0, p.chainsawRechargeUntil - now)
+      });
+      return false;
+    }
+    p.chainsawActiveUntil = now + 3200;
+    p.chainsawRechargeUntil = now + 8200;
+    p.chainsawNextHitAt = now;
+    p.attackAt = now;
+    io.to(room.code).emit("combatEvent", {
+      type: "chainsawStart", attacker: p.id, source: "chainsaw"
+    });
+    return true;
+  }
+
   if (now - p.attackAt < w.cooldown || p.stamina < w.stamina) return false;
   p.attackAt = now; p.stamina -= w.stamina;
   if (w.type === "bow") {
@@ -393,7 +424,21 @@ function performAttack(room, p, noAmmoSocket = null) {
   } else {
     io.to(room.code).emit("combatEvent", { type: "swing", attacker: p.id, source: p.weapon });
     const target = pickMeleeTarget(room, p, w);
-    if (target) applyDamage(room, p, target, w.damage, p.weapon);
+    if (target) {
+      const result = applyDamage(room, p, target, w.damage, p.weapon);
+
+      // La sacca di fango funziona solo se il colpo arriva davvero e non viene parato.
+      if (w.type === "mud" && result && !result.blocked && target.hp > 0) {
+        target.blindedUntil = Date.now() + 5000;
+        io.to(room.code).emit("combatEvent", {
+          type: "mudBlind",
+          attacker: p.id,
+          target: target.id,
+          source: "mud",
+          duration: 5000
+        });
+      }
+    }
   }
   return true;
 }
@@ -652,6 +697,7 @@ io.on("connection", socket => {
     p.owned[item] = true;
     p.weapon = item;
     if (item === "bow") { p.ammo += 8; p.shieldEquipped = false; }
+    if (item === "chainsaw") p.shieldEquipped = false;
     emitRoom(room);
   });
 
@@ -660,14 +706,15 @@ io.on("connection", socket => {
     const p = room.players.get(socket.id);
     if (!p || !WEAPONS[w] || !p.owned[w]) return;
     p.weapon = w;
-    if (w === "bow") p.shieldEquipped = false;
+    if (w === "bow" || w === "chainsaw") p.shieldEquipped = false;
+    if (w !== "chainsaw") p.chainsawActiveUntil = 0;
     emitRoom(room);
   });
 
   socket.on("toggleShield", () => {
     const room = getRoom(socket); if (!room) return;
     const p = room.players.get(socket.id);
-    if (!p || !p.shieldOwned || p.weapon === "bow") return;
+    if (!p || !p.shieldOwned || p.weapon === "bow" || p.weapon === "chainsaw") return;
     p.shieldEquipped = !p.shieldEquipped;
     if (!p.shieldEquipped) p.blocking = false;
     emitRoom(room);
@@ -696,7 +743,7 @@ io.on("connection", socket => {
     if (Number.isFinite(ny)) p.y = clamp(ny, 0, 2.35);
     p.yaw = Number.isFinite(data.yaw) ? data.yaw : p.yaw;
     p.pitch = clamp(Number.isFinite(data.pitch) ? data.pitch : p.pitch, -1.2, 1.2);
-    const canBlock = p.shieldOwned && p.shieldEquipped && p.weapon !== "bow";
+    const canBlock = p.shieldOwned && p.shieldEquipped && p.weapon !== "bow" && p.weapon !== "chainsaw";
     p.blocking = !!data.blocking && canBlock && p.stamina > 0 && room.phase === "active";
   });
 
@@ -745,6 +792,21 @@ setInterval(() => {
     if (room.phase === "active") {
       const bot = [...room.players.values()].find(p => p.isBot);
       if (bot) updateBot(room, bot, dt, now);
+
+      // Motosega attiva: colpisce continuamente SOLO davanti e a distanza ravvicinata.
+      for (const p of room.players.values()) {
+        if (
+          p.hp > 0 &&
+          p.weapon === "chainsaw" &&
+          now < (p.chainsawActiveUntil || 0) &&
+          now >= (p.chainsawNextHitAt || 0)
+        ) {
+          const w = WEAPONS.chainsaw;
+          const target = pickMeleeTarget(room, p, w);
+          if (target) applyDamage(room, p, target, w.damage, "chainsaw");
+          p.chainsawNextHitAt = now + 220;
+        }
+      }
 
       for (const [id, a] of room.arrows) {
         a.x += a.dx * 19 * dt; a.z += a.dz * 19 * dt; a.y += a.dy * 19 * dt;
