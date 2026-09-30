@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v3.0</title>
+<title>Pixel Knight RESTART v3.1</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -1060,6 +1060,225 @@ overflow:hidden}
 }
 #mudBlind.show{opacity:.96}
 
+
+/* ===== v3.1 LOADOUT / AVVERSARIO ===== */
+#enemyWeaponHud{
+  position:absolute;
+  left:50%;
+  top:52px;
+  transform:translateX(-50%);
+  z-index:24;
+  min-width:220px;
+  max-width:min(520px,72vw);
+  padding:7px 12px;
+  text-align:center;
+  font-size:11px;
+  font-weight:900;
+  color:#e3c57f;
+  pointer-events:none;
+}
+#lobby .lobbyContentGrid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 285px;
+  gap:15px;
+  align-items:start;
+}
+#lobby .lobbySections{min-width:0}
+#lobby .loadoutPreview{
+  position:sticky;
+  top:12px;
+  min-height:560px;
+  padding:17px 15px;
+  border-radius:17px;
+  border:1px solid rgba(205,176,107,.30);
+  background:
+    radial-gradient(circle at 50% 28%,rgba(217,180,92,.11),transparent 33%),
+    linear-gradient(180deg,rgba(31,34,42,.98),rgba(13,15,19,.99));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 15px 36px rgba(0,0,0,.24);
+  overflow:hidden;
+}
+#lobby .previewKicker{
+  color:#b99a59;
+  font-size:9px;
+  font-weight:1000;
+  letter-spacing:.20em;
+}
+#lobby .previewName{
+  margin-top:5px;
+  color:#f3eddf;
+  font-size:21px;
+  font-weight:1000;
+}
+#lobby .previewStage{
+  position:relative;
+  height:365px;
+  margin:12px 0 9px;
+  border-radius:14px;
+  border:1px solid rgba(178,157,107,.16);
+  background:
+    linear-gradient(180deg,rgba(32,37,49,.68),rgba(10,12,16,.86)),
+    radial-gradient(circle at 50% 18%,rgba(130,127,160,.25),transparent 50%);
+  overflow:hidden;
+}
+#lobby .previewGlow{
+  position:absolute;
+  width:190px;
+  height:60px;
+  border-radius:50%;
+  left:50%;
+  bottom:22px;
+  transform:translateX(-50%);
+  background:rgba(217,174,83,.10);
+  filter:blur(13px);
+}
+#lobby .previewKnight{
+  --skin:#6f3436;
+  position:absolute;
+  width:170px;
+  height:315px;
+  left:50%;
+  bottom:17px;
+  transform:translateX(-50%);
+}
+#lobby .previewHelmet{
+  position:absolute;
+  left:53px;
+  top:9px;
+  width:66px;
+  height:70px;
+  border-radius:34px 34px 25px 25px;
+  background:linear-gradient(145deg,#b7b9b6,#686d70);
+  border:2px solid #3b3e40;
+  box-shadow:inset -9px -8px 12px rgba(0,0,0,.18);
+}
+#lobby .previewVisor{
+  position:absolute;
+  left:8px;
+  right:8px;
+  top:32px;
+  height:11px;
+  border-radius:4px;
+  background:#25292c;
+  box-shadow:0 12px 0 -4px rgba(35,38,40,.8);
+}
+#lobby .previewTorso{
+  position:absolute;
+  left:45px;
+  top:73px;
+  width:82px;
+  height:128px;
+  border-radius:34px 34px 24px 24px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--skin) 88%,white),var(--skin));
+  border:2px solid rgba(35,38,42,.85);
+  box-shadow:inset -14px -7px 20px rgba(0,0,0,.18);
+}
+#lobby .previewTorso:after{
+  content:"";
+  position:absolute;
+  left:37px;
+  top:9px;
+  bottom:9px;
+  width:6px;
+  border-radius:4px;
+  background:rgba(218,188,112,.42);
+}
+#lobby .previewArm{
+  position:absolute;
+  top:82px;
+  width:25px;
+  height:122px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#92979a,#565c60);
+  border:2px solid #3c4144;
+  transform-origin:50% 10%;
+}
+#lobby .previewArmLeft{left:29px;transform:rotate(8deg)}
+#lobby .previewArmRight{right:26px;transform:rotate(-8deg)}
+#lobby .previewLeg{
+  position:absolute;
+  top:190px;
+  width:31px;
+  height:112px;
+  border-radius:15px;
+  background:linear-gradient(180deg,#41474b,#24282b);
+  border:2px solid #25292b;
+}
+#lobby .previewLegLeft{left:51px}
+#lobby .previewLegRight{right:48px}
+#lobby .previewWeapon{
+  position:absolute;
+  right:-28px;
+  top:130px;
+  width:112px;
+  height:140px;
+  display:grid;
+  place-items:center;
+  font-size:76px;
+  line-height:1;
+  transform:rotate(-18deg);
+  transform-origin:50% 50%;
+  filter:drop-shadow(0 7px 8px rgba(0,0,0,.55));
+  z-index:5;
+}
+#lobby .previewShield{
+  position:absolute;
+  left:-10px;
+  top:124px;
+  width:80px;
+  height:110px;
+  display:none;
+  place-items:center;
+  font-size:65px;
+  filter:drop-shadow(0 7px 8px rgba(0,0,0,.55));
+  z-index:4;
+}
+#lobby .previewShield.show{display:grid}
+#lobby .previewWeaponName{
+  min-height:44px;
+  display:grid;
+  place-items:center;
+  padding:9px 10px;
+  border-radius:11px;
+  border:1px solid rgba(205,176,107,.22);
+  background:rgba(10,12,15,.7);
+  color:#f1e5c6;
+  font-weight:1000;
+  text-align:center;
+}
+#lobby .previewMeta{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:9px;
+  color:#c9b37b;
+  font-size:11px;
+  font-weight:900;
+}
+#lobby .previewEnemy{
+  margin-top:12px;
+  padding-top:11px;
+  border-top:1px solid rgba(205,176,107,.16);
+  color:#9fa1a4;
+  font-size:11px;
+  line-height:1.5;
+}
+@media(max-width:900px){
+  #lobby .lobbyContentGrid{grid-template-columns:1fr}
+  #lobby .loadoutPreview{
+    position:relative;
+    top:auto;
+    min-height:auto;
+  }
+  #lobby .previewStage{height:330px}
+}
+@media(max-width:650px){
+  #enemyWeaponHud{
+    top:57px;
+    min-width:180px;
+    font-size:9px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1068,6 +1287,7 @@ overflow:hidden}
   <div id="top">
     <div class="card"><div class="name" id="meName">Tu</div><div class="small" id="roomLabel">Non connesso</div><div class="small" id="mapLabel"></div></div>
     <div id="score">0 — 0</div>
+    <div id="enemyWeaponHud" class="card">Avversario: ⚔ Spada</div>
     <div class="card bars">
       <div class="row"><span>VITA</span><div class="bar"><div class="fill hp" id="hpFill"></div></div><b id="hpText">100</b></div>
       <div class="row"><span>STAMINA</span><div class="bar"><div class="fill st" id="stFill"></div></div><b id="stText">100</b></div>
@@ -1253,31 +1473,61 @@ overflow:hidden}
   </div>
 
   <div class="lobbyBody">
-   <section class="lobbySection playerSection">
-    <div class="sectionHead"><span>01</span><div><b>Cavalieri</b><small>Giocatori presenti nella lobby</small></div></div>
-    <div id="players"></div>
-   </section>
+   <div class="lobbyContentGrid">
+    <div class="lobbySections">
+     <section class="lobbySection playerSection">
+      <div class="sectionHead"><span>01</span><div><b>Cavalieri</b><small>Giocatori presenti nella lobby</small></div></div>
+      <div id="players"></div>
+     </section>
 
-   <section class="lobbySection">
-    <div class="sectionHead"><span>02</span><div><b>Scegli la mappa</b><small>Il campo dove si svolgerà il combattimento</small></div></div>
-    <div class="mapGrid" id="mapGrid"></div>
-   </section>
+     <section class="lobbySection">
+      <div class="sectionHead"><span>02</span><div><b>Scegli la mappa</b><small>Il campo dove si svolgerà il combattimento</small></div></div>
+      <div class="mapGrid" id="mapGrid"></div>
+     </section>
 
-   <section class="lobbySection">
-    <div class="sectionHead"><span>03</span><div><b>Scegli la skin</b><small>L'aspetto del tuo cavaliere</small></div></div>
-    <div class="choiceGrid" id="skinGrid"></div>
-   </section>
+     <section class="lobbySection">
+      <div class="sectionHead"><span>03</span><div><b>Scegli la skin</b><small>L'aspetto del tuo cavaliere</small></div></div>
+      <div class="choiceGrid" id="skinGrid"></div>
+     </section>
 
-   <section class="lobbySection">
-    <div class="sectionHead"><span>04</span><div><b>Armeria</b><small>Acquista armi, munizioni e scudo</small></div></div>
-    <div class="store" id="store"></div>
-   </section>
+     <section class="lobbySection">
+      <div class="sectionHead"><span>04</span><div><b>Armeria</b><small>Acquista armi, munizioni e scudo</small></div></div>
+      <div class="store" id="store"></div>
+     </section>
 
-   <section class="lobbySection">
-    <div class="sectionHead"><span>05</span><div><b>Equipaggiamento</b><small>Scegli cosa portare in battaglia</small></div></div>
-    <div class="choiceGrid" id="weaponGrid"></div>
-    <div class="choiceGrid" id="shieldGrid"></div>
-   </section>
+     <section class="lobbySection">
+      <div class="sectionHead"><span>05</span><div><b>Equipaggiamento</b><small>Scegli cosa portare in battaglia</small></div></div>
+      <div class="choiceGrid" id="weaponGrid"></div>
+      <div class="choiceGrid" id="shieldGrid"></div>
+     </section>
+    </div>
+
+    <aside class="loadoutPreview" id="loadoutPreview">
+     <div class="previewKicker">IL TUO CAVALIERE</div>
+     <div class="previewName" id="previewName">Cavaliere</div>
+     <div class="previewStage">
+      <div class="previewGlow"></div>
+      <div class="previewKnight" id="previewKnight">
+       <div class="previewHelmet">
+        <div class="previewVisor"></div>
+       </div>
+       <div class="previewTorso" id="previewTorso"></div>
+       <div class="previewArm previewArmLeft"></div>
+       <div class="previewArm previewArmRight"></div>
+       <div class="previewLeg previewLegLeft"></div>
+       <div class="previewLeg previewLegRight"></div>
+       <div class="previewShield" id="previewShield">🛡</div>
+       <div class="previewWeapon" id="previewWeapon">⚔</div>
+      </div>
+     </div>
+     <div class="previewWeaponName" id="previewWeaponName">⚔ Spada</div>
+     <div class="previewMeta">
+      <span id="previewCoins">🪙 220</span>
+      <span id="previewAmmo"></span>
+     </div>
+     <div class="previewEnemy" id="previewEnemy">Avversario: in attesa</div>
+    </aside>
+   </div>
 
    <div class="readyDock">
     <div>
@@ -1311,7 +1561,7 @@ const ui={
  score:document.getElementById("score"),hpFill:document.getElementById("hpFill"),hpText:document.getElementById("hpText"),
  stFill:document.getElementById("stFill"),stText:document.getElementById("stText"),center:document.getElementById("centerMsg"),
  weapon:document.getElementById("weaponText"),ammo:document.getElementById("ammoText"),block:document.getElementById("blockState"),
- damage:document.getElementById("damage"),cross:document.getElementById("cross"),damageNumbers:document.getElementById("damageNumbers"),mudBlind:document.getElementById("mudBlind")
+ damage:document.getElementById("damage"),cross:document.getElementById("cross"),damageNumbers:document.getElementById("damageNumbers"),mudBlind:document.getElementById("mudBlind"),enemyWeaponHud:document.getElementById("enemyWeaponHud")
 };
 
 const hubCards=[...document.querySelectorAll("#menu .hubCard")];
@@ -1332,6 +1582,11 @@ const MAP_INFO={
  colosseum:{name:"Colosseo delle Ceneri",arena:17,obstacles:[{x:-6.2,z:-6.2,r:.8},{x:6.2,z:-6.2,r:.8},{x:-6.2,z:6.2,r:.8},{x:6.2,z:6.2,r:.8}]}
 };
 const WEAPON_NAMES={sword:"⚔ Spada",dagger:"🗡 Pugnale",chainsaw:"🪚 Motosega",mud:"🟤 Sacca di fango",mace:"🔨 Mazza ferrata",greatsword:"⚔ Spadone",spear:"🔱 Lancia",axe:"🪓 Ascia da guerra",bow:"🏹 Arco"};
+const WEAPON_PREVIEW_ICONS={
+ sword:"⚔",dagger:"🗡",chainsaw:"🪚",mud:"🟤",
+ mace:"🔨",greatsword:"⚔",spear:"🔱",axe:"🪓",bow:"🏹"
+};
+
 const STORE=[
  {id:"dagger",name:"🗡 Pugnale",cost:45,desc:"Velocissimo ma leggero: 9 danni, poca stamina e attacchi molto rapidi."},
  {id:"chainsaw",name:"🪚 Motosega",cost:130,desc:"Si accende e taglia davanti per 3,2 secondi. Poi deve ricaricarsi per 5 secondi."},
@@ -1464,36 +1719,126 @@ function makeKnight(color=0x6f3436){
  };
  return g;
 }
-function makeNameTag(name){
- const canvas=document.createElement("canvas");canvas.width=512;canvas.height=96;
+function makeNameTag(name,weaponId){
+ const canvas=document.createElement("canvas");canvas.width=512;canvas.height=128;
  const ctx=canvas.getContext("2d");
- ctx.clearRect(0,0,512,96);
- ctx.fillStyle="rgba(0,0,0,.62)";
- ctx.fillRect(6,12,500,70);
- ctx.font="bold 38px system-ui,Segoe UI,Arial";
+ ctx.clearRect(0,0,512,128);
+ ctx.fillStyle="rgba(0,0,0,.68)";
+ ctx.fillRect(6,8,500,108);
  ctx.textAlign="center";ctx.textBaseline="middle";
+
+ ctx.font="bold 34px system-ui,Segoe UI,Arial";
  ctx.fillStyle="#ffffff";
- ctx.fillText(String(name||"Giocatore").slice(0,18),256,47);
+ ctx.fillText(String(name||"Giocatore").slice(0,18),256,40);
+
+ ctx.font="bold 23px system-ui,Segoe UI,Arial";
+ ctx.fillStyle="#e3c57f";
+ ctx.fillText(WEAPON_NAMES[weaponId]||"⚔ Spada",256,86);
+
  const tex=new THREE.CanvasTexture(canvas);
  tex.colorSpace=THREE.SRGBColorSpace;
  const mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:true,depthWrite:false});
  const sprite=new THREE.Sprite(mat);
- sprite.position.set(0,2.62,0);
- sprite.scale.set(1.72,.32,1);
+ sprite.position.set(0,2.70,0);
+ sprite.scale.set(1.82,.45,1);
  sprite.userData.texture=tex;
  return sprite;
 }
-function setAvatarName(avatar,name){
- if(avatar.name===name)return;
+function setAvatarName(avatar,name,weaponId){
+ if(avatar.name===name&&avatar.tagWeapon===weaponId)return;
  if(avatar.tag){
   avatar.group.remove(avatar.tag);
   avatar.tag.material?.map?.dispose?.();
   avatar.tag.material?.dispose?.();
  }
- avatar.tag=makeNameTag(name);
+ avatar.tag=makeNameTag(name,weaponId);
  avatar.group.add(avatar.tag);
  avatar.name=name;
+ avatar.tagWeapon=weaponId;
 }
+
+function makeRemoteWeaponModel(id){
+ const g=new THREE.Group();
+ const steel=new THREE.MeshStandardMaterial({color:0xb2b5b4,roughness:.38,metalness:.78});
+ const dark=new THREE.MeshStandardMaterial({color:0x3b4144,roughness:.5,metalness:.58});
+ const wood=new THREE.MeshStandardMaterial({color:0x6a4528,roughness:.88});
+ const gold=new THREE.MeshStandardMaterial({color:0xb48a42,roughness:.45,metalness:.62});
+ const red=new THREE.MeshStandardMaterial({color:0x842d23,roughness:.55,metalness:.25});
+ const mudMat=new THREE.MeshStandardMaterial({color:0x5b3217,roughness:1});
+
+ const b=(w,h,d,mat,x=0,y=0,z=0)=>{
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+  m.position.set(x,y,z);m.castShadow=true;g.add(m);return m;
+ };
+ const c=(r,h,mat,x=0,y=0,z=0)=>{
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,9),mat);
+  m.position.set(x,y,z);m.castShadow=true;g.add(m);return m;
+ };
+
+ if(id==="dagger"){
+  b(.08,.42,.035,steel,0,-.27,0);b(.28,.045,.06,gold,0,-.02,0);c(.04,.24,wood,0,.12,0);
+ }else if(id==="mace"){
+  c(.045,.64,wood,0,-.18,0);
+  const h=new THREE.Mesh(new THREE.SphereGeometry(.17,9,7),dark);h.position.y=-.53;h.castShadow=true;g.add(h);
+ }else if(id==="greatsword"){
+  b(.13,.95,.04,steel,0,-.55,0);b(.55,.055,.07,gold,0,-.05,0);c(.05,.35,wood,0,.17,0);
+ }else if(id==="spear"){
+  c(.035,1.40,wood,0,-.43,0);
+  const tip=new THREE.Mesh(new THREE.ConeGeometry(.10,.30,5),steel);tip.position.y=-1.25;tip.rotation.z=Math.PI;g.add(tip);
+ }else if(id==="axe"){
+  c(.045,.80,wood,0,-.28,0);b(.42,.22,.07,dark,.13,-.66,0);
+ }else if(id==="bow"){
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.34,.035,6,20,Math.PI*1.55),wood);
+  ring.rotation.z=Math.PI/2;ring.position.y=-.33;g.add(ring);
+ }else if(id==="chainsaw"){
+  b(.34,.25,.28,red,0,-.14,0);b(.14,.75,.08,steel,0,-.62,0);b(.20,.035,.10,dark,0,-.99,0);
+ }else if(id==="mud"){
+  const pouch=new THREE.Mesh(new THREE.SphereGeometry(.18,10,8),mudMat);
+  pouch.scale.set(1,.85,.85);pouch.position.y=-.31;g.add(pouch);
+ }else{
+  b(.09,.72,.035,steel,0,-.43,0);b(.40,.05,.065,gold,0,-.06,0);c(.045,.30,wood,0,.13,0);
+ }
+
+ g.position.set(0,-.56,-.08);
+ g.rotation.z=-.10;
+ return g;
+}
+
+function makeRemoteShield(){
+ const g=new THREE.Group();
+ const metal=new THREE.MeshStandardMaterial({color:0x59636a,roughness:.45,metalness:.72});
+ const rim=new THREE.MeshStandardMaterial({color:0xb48a42,roughness:.45,metalness:.62});
+ const disc=new THREE.Mesh(new THREE.CylinderGeometry(.30,.30,.065,16),metal);
+ disc.rotation.x=Math.PI/2;g.add(disc);
+ const r=new THREE.Mesh(new THREE.TorusGeometry(.30,.025,6,18),rim);
+ r.rotation.x=Math.PI/2;g.add(r);
+ g.position.set(0,-.54,-.14);
+ g.rotation.z=.18;
+ return g;
+}
+
+function syncRemoteEquipment(avatar,p){
+ const rig=avatar.group.userData.rig;
+ if(!rig)return;
+
+ if(avatar.weapon!==p.weapon){
+  if(avatar.weaponMesh)rig.rightArm.remove(avatar.weaponMesh);
+  avatar.weaponMesh=makeRemoteWeaponModel(p.weapon);
+  rig.rightArm.add(avatar.weaponMesh);
+  avatar.weapon=p.weapon;
+ }
+ const wantsShield=!!p.shieldEquipped;
+ if(avatar.shieldVisible!==wantsShield){
+  if(avatar.shieldMesh)rig.leftArm.remove(avatar.shieldMesh);
+  avatar.shieldMesh=null;
+  if(wantsShield){
+   avatar.shieldMesh=makeRemoteShield();
+   rig.leftArm.add(avatar.shieldMesh);
+  }
+  avatar.shieldVisible=wantsShield;
+ }
+}
+
 function applyRemoteSkin(avatar,id){
  const s=SKINS[id]||SKINS.crimson;
  avatar.group.userData.bodyMat.color.setHex(s.color);
@@ -1511,6 +1856,11 @@ function getRemoteAvatar(p){
    skin:"",
    name:"",
    tag:null,
+   tagWeapon:"",
+   weapon:"",
+   weaponMesh:null,
+   shieldMesh:null,
+   shieldVisible:false,
    moveAmount:0,
    walkPhase:Math.random()*Math.PI*2,
    idlePhase:Math.random()*Math.PI*2,
@@ -1520,7 +1870,8 @@ function getRemoteAvatar(p){
   remoteAvatars.set(p.id,avatar);
  }
  if(avatar.skin!==p.skin)applyRemoteSkin(avatar,p.skin);
- setAvatarName(avatar,p.name);
+ setAvatarName(avatar,p.name,p.weapon);
+ syncRemoteEquipment(avatar,p);
  return avatar;
 }
 function removeRemoteAvatar(id){
@@ -1812,6 +2163,12 @@ function refreshHud(){
  }
  ui.block.style.display=local.blocking&&me.shieldEquipped?"block":"none";
 
+ const visibleEnemies=othersFromState().filter(p=>p.alive!==false);
+ if(ui.enemyWeaponHud){
+  if(!visibleEnemies.length)ui.enemyWeaponHud.textContent="Nessun avversario";
+  else ui.enemyWeaponHud.textContent=visibleEnemies.map(p=>`${p.name}: ${weaponName(p)}${p.shieldEquipped?" + 🛡":""}`).join("  •  ");
+ }
+
  if(state?.mode==="private"&&state?.privateFormat==="2v2"){
   const a=Math.max(0,...state.players.filter(p=>p.team===0).map(p=>p.score||0));
   const b=Math.max(0,...state.players.filter(p=>p.team===1).map(p=>p.score||0));
@@ -1832,6 +2189,39 @@ function lobbySig(s){
  });
 }
 function flashSelection(text){const e=document.getElementById("selectionStatus");e.textContent="✓ "+text;clearTimeout(flashSelection.t);flashSelection.t=setTimeout(()=>{e.textContent=""},1200)}
+
+
+function updateLoadoutPreview(){
+ if(!me)return;
+ const skin=SKINS[me.skin]||SKINS.crimson;
+ const name=document.getElementById("previewName");
+ const torso=document.getElementById("previewTorso");
+ const weapon=document.getElementById("previewWeapon");
+ const weaponNameEl=document.getElementById("previewWeaponName");
+ const coins=document.getElementById("previewCoins");
+ const ammo=document.getElementById("previewAmmo");
+ const shield=document.getElementById("previewShield");
+ const enemy=document.getElementById("previewEnemy");
+
+ if(name)name.textContent=me.name||"Cavaliere";
+ if(torso)torso.parentElement?.style.setProperty("--skin",skin.css);
+ if(weapon){
+  weapon.textContent=WEAPON_PREVIEW_ICONS[me.weapon]||"⚔";
+  weapon.dataset.weapon=me.weapon||"sword";
+  weapon.style.fontSize=me.weapon==="chainsaw"?"82px":(me.weapon==="mud"?"62px":"76px");
+  weapon.style.transform=me.weapon==="bow"?"rotate(8deg)":"rotate(-18deg)";
+ }
+ if(weaponNameEl)weaponNameEl.textContent=weaponName(me);
+ if(coins)coins.textContent=`🪙 ${me.coins}`;
+ if(ammo)ammo.textContent=me.weapon==="bow"?`➶ ${me.ammo}`:"";
+ if(shield)shield.classList.toggle("show",!!me.shieldEquipped);
+
+ const enemies=othersFromState();
+ if(enemy){
+  if(!enemies.length)enemy.textContent="Avversario: in attesa";
+  else enemy.innerHTML=enemies.map(p=>`<b>${p.name}</b><br>${weaponName(p)}${p.shieldEquipped?" + 🛡":""}`).join("<hr>");
+ }
+}
 
 function renderMapButtons(){
  const c=document.getElementById("mapGrid");c.innerHTML="";
@@ -1899,7 +2289,7 @@ function refreshLobby(){
   d.innerHTML=`<b>${p.name}</b>${p.id===state.hostId?" · 👑 HOST":""}${p.isBot?" · 🤖":""}${team}<br><span class="small">${weaponName(p)} ${p.shieldEquipped?" + 🛡":""} · Skin: ${(SKINS[p.skin]||SKINS.crimson).name}${p.isBot?"":` · 🪙 ${p.coins} · ➶ ${p.ammo}`} ${p.ready?"· ✅ PRONTO":""}</span>`;
   ps.appendChild(d);
  });
- renderMapButtons();renderSkins();renderStore();renderWeaponSelector();renderShieldSelector();refreshInventory();
+ renderMapButtons();renderSkins();renderStore();renderWeaponSelector();renderShieldSelector();refreshInventory();updateLoadoutPreview();
  const rb=document.getElementById("readyBtn");
  rb.textContent=me.ready?"Annulla pronto":"✓ Pronto";
  rb.disabled=state.phase!=="lobby";
