@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pixel Knight RESTART v3.1</title>
+<title>Pixel Knight RESTART v3.2</title>
 <style>
 :root{--panel:#141618;--line:#4f4b40;--gold:#d0ad5b;--red:#ad4542;--green:#63885c;--text:#eee9dc;--muted:#aaa495}
 *{box-sizing:border-box}
@@ -1279,6 +1279,18 @@ overflow:hidden}
   }
 }
 
+
+#lobby #preview3D{
+  position:absolute;
+  inset:0;
+  z-index:2;
+}
+#lobby #preview3D canvas{
+  width:100% !important;
+  height:100% !important;
+  display:block;
+}
+
 </style>
 </head>
 <body>
@@ -1296,7 +1308,7 @@ overflow:hidden}
   <div id="cross"></div><div id="damageNumbers"></div><div id="centerMsg"></div>
   <div id="blockState" class="card">SCUDO ALZATO</div>
   <div id="bottom"><div class="card" id="weaponCard"><div class="small">EQUIPAGGIAMENTO</div><b id="weaponText">Spada</b><div class="ammo" id="ammoText"></div></div></div>
-  <div id="help" class="card">W avanti · S indietro · A sinistra · D destra<br>SPAZIO salto · SHIFT corsa · Mouse guarda · CLICK SX attacco (con arco: tieni e rilascia)<br>CLICK DX scudo · I inventario · ESC libera mouse</div>
+  <div id="help" class="card">W avanti · S indietro · A/D movimento laterale · DOPPIO A/D schivata<br>SPAZIO salto · SHIFT corsa · Mouse guarda · CLICK SX attacco (con arco: tieni e rilascia)<br>CLICK DX scudo · I inventario · ESC libera mouse</div>
   <div id="damage"></div>
   <div id="mudBlind" aria-hidden="true"></div>
   <button id="settingsBtn" class="card" type="button" aria-label="Impostazioni">⚙</button>
@@ -1503,22 +1515,11 @@ overflow:hidden}
     </div>
 
     <aside class="loadoutPreview" id="loadoutPreview">
-     <div class="previewKicker">IL TUO CAVALIERE</div>
+     <div class="previewKicker">IL TUO CAVALIERE · NUOVO MODELLO</div>
      <div class="previewName" id="previewName">Cavaliere</div>
      <div class="previewStage">
       <div class="previewGlow"></div>
-      <div class="previewKnight" id="previewKnight">
-       <div class="previewHelmet">
-        <div class="previewVisor"></div>
-       </div>
-       <div class="previewTorso" id="previewTorso"></div>
-       <div class="previewArm previewArmLeft"></div>
-       <div class="previewArm previewArmRight"></div>
-       <div class="previewLeg previewLegLeft"></div>
-       <div class="previewLeg previewLegRight"></div>
-       <div class="previewShield" id="previewShield">🛡</div>
-       <div class="previewWeapon" id="previewWeapon">⚔</div>
-      </div>
+      <div id="preview3D" aria-label="Anteprima 3D del cavaliere"></div>
      </div>
      <div class="previewWeaponName" id="previewWeaponName">⚔ Spada</div>
      <div class="previewMeta">
@@ -1612,6 +1613,10 @@ let keys={},last=performance.now(),attackAnim=0,hitFlash=0,currentMap="";
 let lobbySignature="";
 let controlMode=localStorage.getItem("pixelKnightControlMode")||((navigator.maxTouchPoints||0)>0?"mobile":"pc");
 let mobileMove={forward:0,side:0};
+let dodgeState=null;
+let dodgePendingUntil=0;
+let lastDodgeTap={KeyA:0,KeyD:0};
+let dodgeCameraRoll=0;
 let mobileSprint=false;
 let mobileLookPointer=null,mobileLookLast={x:0,y:0};
 let joystickPointer=null;
@@ -1662,55 +1667,202 @@ function buildArena(id){
  }
 }
 
-function makeKnight(color=0x6f3436){
+function makeKnight(color=0x355a7d){
  const g=new THREE.Group();
- const bodyMat=new THREE.MeshStandardMaterial({color,roughness:.65,metalness:.25,emissive:0x000000});
- const metal=new THREE.MeshStandardMaterial({color:0x929798,roughness:.48,metalness:.7,emissive:0x000000});
- const legMat=new THREE.MeshStandardMaterial({color:0x34383a,roughness:.8,emissive:0x000000});
- const visorMat=new THREE.MeshStandardMaterial({color:0x25282a,roughness:.4,metalness:.8,emissive:0x000000});
- g.userData.bodyMat=bodyMat;g.userData.metalMat=metal;g.userData.legMat=legMat;
 
- // Busto separato: può ruotare e respirare senza trascinare gambe e testa come un blocco unico.
+ // Palette: armatura chiara + bordi oro + colore della skin.
+ const accent=new THREE.MeshStandardMaterial({color,roughness:.62,metalness:.18,emissive:0x000000});
+ const accentDark=new THREE.MeshStandardMaterial({color:new THREE.Color(color).multiplyScalar(.58),roughness:.72,metalness:.12,emissive:0x000000});
+ const plate=new THREE.MeshStandardMaterial({color:0xd9dcda,roughness:.42,metalness:.68,emissive:0x000000});
+ const plateBright=new THREE.MeshStandardMaterial({color:0xf0eee7,roughness:.48,metalness:.54,emissive:0x000000});
+ const gold=new THREE.MeshStandardMaterial({color:0xc99a42,roughness:.40,metalness:.72,emissive:0x000000});
+ const under=new THREE.MeshStandardMaterial({color:0x292b31,roughness:.90,metalness:.05,emissive:0x000000});
+ const leather=new THREE.MeshStandardMaterial({color:0x513522,roughness:.92,metalness:.02,emissive:0x000000});
+ const skin=new THREE.MeshStandardMaterial({color:0xc98f68,roughness:.86,metalness:0,emissive:0x000000});
+ const hair=new THREE.MeshStandardMaterial({color:0x4a2d22,roughness:.92,metalness:0,emissive:0x000000});
+ const eye=new THREE.MeshStandardMaterial({color:0x1b1715,roughness:.65,metalness:0,emissive:0x000000});
+
+ g.userData.bodyMat=accent;
+ g.userData.metalMat=plate;
+ g.userData.legMat=under;
+ g.userData.accentMat=accent;
+ g.userData.accentDarkMat=accentDark;
+ g.userData.accentMaterials=[accent,accentDark];
+
+ const mesh=(geo,mat,parent=g)=>{
+  const m=new THREE.Mesh(geo,mat);
+  m.castShadow=true;m.receiveShadow=true;
+  parent.add(m);return m;
+ };
+ const box=(w,h,d,mat,parent,x=0,y=0,z=0)=>{
+  const m=mesh(new THREE.BoxGeometry(w,h,d),mat,parent);
+  m.position.set(x,y,z);return m;
+ };
+ const cyl=(r1,r2,h,mat,parent,x=0,y=0,z=0,seg=10)=>{
+  const m=mesh(new THREE.CylinderGeometry(r1,r2,h,seg),mat,parent);
+  m.position.set(x,y,z);return m;
+ };
+
+ // ---------- BUSTO ----------
  const torso=new THREE.Group();
- torso.position.set(0,1.05,0);
+ torso.position.set(0,1.14,0);
  g.add(torso);
- const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.85,5,10),bodyMat);
- body.castShadow=true;
- torso.add(body);
 
- // Testa su un pivot indipendente: guarda nella direzione del giocatore prima del resto del corpo.
+ // Corpo scuro sotto l'armatura.
+ const core=mesh(new THREE.CapsuleGeometry(.35,.62,5,10),under,torso);
+ core.scale.set(1,.96,.74);
+
+ // Corazza bianca a forma più "eroica", con vita stretta.
+ const chest=box(.76,.68,.34,plateBright,torso,0,.10,-.015);
+ chest.scale.set(1,.96,1);
+ chest.rotation.x=-.025;
+
+ // Fascia verticale frontale colorata.
+ const frontTabard=box(.43,.78,.055,accent,torso,0,-.24,-.205);
+ frontTabard.rotation.x=-.025;
+ const tabardTip=mesh(new THREE.ConeGeometry(.305,.36,4),accent,torso);
+ tabardTip.rotation.z=Math.PI/4;
+ tabardTip.rotation.x=Math.PI/2;
+ tabardTip.position.set(0,-.77,-.205);
+
+ // Bande dorate sul petto.
+ box(.055,.72,.065,gold,torso,-.245,-.12,-.225);
+ box(.055,.72,.065,gold,torso,.245,-.12,-.225);
+ box(.66,.055,.37,gold,torso,0,.44,-.015);
+
+ // Emblema dorato semplice sul petto.
+ const emblem=box(.15,.15,.045,gold,torso,0,.12,-.245);
+ emblem.rotation.z=Math.PI/4;
+ box(.055,.30,.05,gold,torso,0,.12,-.247);
+
+ // Cintura.
+ box(.78,.13,.42,leather,torso,0,-.52,0);
+ const buckle=box(.20,.20,.46,gold,torso,0,-.52,-.01);
+ buckle.rotation.z=Math.PI/4;
+
+ // Mantello posteriore colorato con punta.
+ const capeShape=new THREE.Shape();
+ capeShape.moveTo(-.43,.52);
+ capeShape.lineTo(.43,.52);
+ capeShape.lineTo(.39,-.55);
+ capeShape.lineTo(0,-.83);
+ capeShape.lineTo(-.39,-.55);
+ capeShape.closePath();
+ const cape=mesh(new THREE.ShapeGeometry(capeShape),accentDark,torso);
+ cape.position.set(0,-.11,.245);
+ cape.rotation.y=Math.PI; // visibile bene anche dal retro
+ const capeEdges=new THREE.LineSegments(
+  new THREE.EdgesGeometry(cape.geometry),
+  new THREE.LineBasicMaterial({color:0xd3a34a})
+ );
+ capeEdges.position.copy(cape.position);
+ capeEdges.rotation.copy(cape.rotation);
+ torso.add(capeEdges);
+
+ // ---------- TESTA / VOLTO / CAPELLI ----------
  const headPivot=new THREE.Group();
- headPivot.position.set(0,1.69,0);
+ headPivot.position.set(0,1.72,0);
  g.add(headPivot);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.34,16,12),metal);
- head.position.y=.26;head.castShadow=true;
- headPivot.add(head);
- const visor=new THREE.Mesh(new THREE.BoxGeometry(.5,.13,.1),visorMat);
- visor.position.set(0,.27,-.31);
- headPivot.add(visor);
 
- // Braccia articolate dalle spalle.
+ // Collo/scaldacollo colorato.
+ const collar=cyl(.29,.32,.18,accentDark,headPivot,0,-.02,0,12);
+ collar.scale.z=.86;
+
+ // Volto scoperto.
+ const face=mesh(new THREE.SphereGeometry(.27,16,12),skin,headPivot);
+ face.position.set(0,.30,-.015);
+ face.scale.set(.92,1.08,.88);
+
+ // Occhi minimali ma leggibili.
+ for(const sx of [-1,1]){
+  const e=mesh(new THREE.SphereGeometry(.026,8,6),eye,headPivot);
+  e.position.set(.09*sx,.33,-.242);
+ }
+ // Naso piccolo.
+ const nose=mesh(new THREE.ConeGeometry(.025,.07,5),skin,headPivot);
+ nose.rotation.x=-Math.PI/2;
+ nose.position.set(0,.27,-.255);
+
+ // Capelli anime stilizzati.
+ const hairCap=mesh(new THREE.SphereGeometry(.292,14,10),hair,headPivot);
+ hairCap.position.set(0,.40,.015);
+ hairCap.scale.set(1.03,.79,.96);
+
+ const hairSpikes=[
+  [-.21,.55,-.02,-.35],[-.09,.63,-.02,-.12],[.05,.64,-.01,.10],
+  [.19,.57,.00,.32],[-.27,.43,.04,-.60],[.27,.43,.04,.58],
+  [-.17,.68,.05,-.28],[.14,.69,.05,.24]
+ ];
+ hairSpikes.forEach(([x,y,z,rz],i)=>{
+  const s=mesh(new THREE.ConeGeometry(.075,.25,6),hair,headPivot);
+  s.position.set(x,y,z);
+  s.rotation.z=rz;
+  s.rotation.x=i%2?.08:-.06;
+ });
+
+ // ---------- BRACCIA ----------
  const leftArm=new THREE.Group(),rightArm=new THREE.Group();
- leftArm.position.set(-.52,1.42,0);
- rightArm.position.set(.52,1.42,0);
+ leftArm.position.set(-.52,1.43,0);
+ rightArm.position.set(.52,1.43,0);
  g.add(leftArm,rightArm);
- const leftArmMesh=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.65,4,8),metal);
- const rightArmMesh=leftArmMesh.clone();
- leftArmMesh.position.y=-.28;rightArmMesh.position.y=-.28;
- leftArmMesh.rotation.z=-.18;rightArmMesh.rotation.z=.18;
- leftArmMesh.castShadow=rightArmMesh.castShadow=true;
- leftArm.add(leftArmMesh);rightArm.add(rightArmMesh);
 
- // Gambe articolate dalle anche.
+ function buildArm(arm,side){
+  const upper=mesh(new THREE.CapsuleGeometry(.105,.42,4,8),under,arm);
+  upper.position.y=-.25;
+  upper.rotation.z=side*.06;
+
+  // Spallaccio largo bianco + bordo oro.
+  const pauldron=box(.42,.24,.40,plateBright,arm,side*.08,.02,0);
+  pauldron.rotation.z=side*.18;
+  const trim=box(.44,.045,.42,gold,arm,side*.08,-.105,0);
+  trim.rotation.z=side*.18;
+
+  // Avambraccio corazzato.
+  const fore=box(.22,.46,.22,plate,arm,side*.02,-.59,-.01);
+  fore.rotation.z=side*.05;
+  box(.24,.055,.24,gold,arm,side*.02,-.38,-.01);
+
+  const glove=mesh(new THREE.SphereGeometry(.13,10,8),under,arm);
+  glove.position.set(side*.02,-.86,-.015);
+ }
+ buildArm(leftArm,-1);
+ buildArm(rightArm,1);
+
+ // ---------- GAMBE ----------
  const leftLeg=new THREE.Group(),rightLeg=new THREE.Group();
- leftLeg.position.set(-.21,.72,0);
- rightLeg.position.set(.21,.72,0);
+ leftLeg.position.set(-.22,.73,0);
+ rightLeg.position.set(.22,.73,0);
  g.add(leftLeg,rightLeg);
- const leftLegMesh=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.65,4,8),legMat);
- const rightLegMesh=leftLegMesh.clone();
- leftLegMesh.position.y=-.36;rightLegMesh.position.y=-.36;
- leftLegMesh.castShadow=rightLegMesh.castShadow=true;
- leftLeg.add(leftLegMesh);rightLeg.add(rightLegMesh);
+
+ function buildLeg(leg,side){
+  const thigh=mesh(new THREE.CapsuleGeometry(.12,.38,4,8),under,leg);
+  thigh.position.y=-.20;
+
+  // Ginocchiera.
+  const knee=box(.26,.24,.26,plateBright,leg,0,-.48,-.06);
+  knee.rotation.z=side*.03;
+  box(.27,.05,.27,gold,leg,0,-.37,-.06);
+
+  // Schiniere bianco.
+  const shin=box(.25,.48,.24,plate,leg,0,-.78,-.02);
+  shin.scale.set(.92,1,1);
+  box(.27,.055,.26,gold,leg,0,-.58,-.02);
+
+  // Stivale.
+  const boot=box(.29,.18,.42,under,leg,0,-1.06,-.09);
+  boot.position.z=-.10;
+  box(.30,.045,.44,gold,leg,0,-.98,-.10);
+ }
+ buildLeg(leftLeg,-1);
+ buildLeg(rightLeg,1);
+
+ // ---------- PIASTRE LATERALI DEL TABARDO ----------
+ const skirtL=box(.22,.70,.10,plateBright,torso,-.35,-.50,-.02);
+ skirtL.rotation.z=.14;
+ const skirtR=box(.22,.70,.10,plateBright,torso,.35,-.50,-.02);
+ skirtR.rotation.z=-.14;
+ box(.045,.70,.115,gold,torso,-.45,-.50,-.02);
+ box(.045,.70,.115,gold,torso,.45,-.50,-.02);
 
  g.userData.rig={
   torso,headPivot,leftArm,rightArm,leftLeg,rightLeg,
@@ -1719,6 +1871,7 @@ function makeKnight(color=0x6f3436){
  };
  return g;
 }
+
 function makeNameTag(name,weaponId){
  const canvas=document.createElement("canvas");canvas.width=512;canvas.height=128;
  const ctx=canvas.getContext("2d");
@@ -1841,7 +1994,10 @@ function syncRemoteEquipment(avatar,p){
 
 function applyRemoteSkin(avatar,id){
  const s=SKINS[id]||SKINS.crimson;
- avatar.group.userData.bodyMat.color.setHex(s.color);
+ const c=new THREE.Color(s.color);
+ avatar.group.userData.accentMat?.color.set(c);
+ avatar.group.userData.accentDarkMat?.color.copy(c).multiplyScalar(.58);
+ avatar.group.userData.bodyMat?.color.set(c);
  avatar.skin=id;
 }
 function getRemoteAvatar(p){
@@ -1861,6 +2017,8 @@ function getRemoteAvatar(p){
    weaponMesh:null,
    shieldMesh:null,
    shieldVisible:false,
+   dodgeFx:0,
+   dodgeDir:0,
    moveAmount:0,
    walkPhase:Math.random()*Math.PI*2,
    idlePhase:Math.random()*Math.PI*2,
@@ -2191,36 +2349,117 @@ function lobbySig(s){
 function flashSelection(text){const e=document.getElementById("selectionStatus");e.textContent="✓ "+text;clearTimeout(flashSelection.t);flashSelection.t=setTimeout(()=>{e.textContent=""},1200)}
 
 
+let previewRenderer=null,previewScene=null,previewCamera=null,previewAvatar=null,previewWeaponId="",previewShieldState=false;
+
+function ensurePreview3D(){
+ const host=document.getElementById("preview3D");
+ if(!host||previewRenderer)return;
+
+ previewRenderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});
+ previewRenderer.setPixelRatio(Math.min(1.7,devicePixelRatio||1));
+ previewRenderer.outputColorSpace=THREE.SRGBColorSpace;
+ previewRenderer.toneMapping=THREE.ACESFilmicToneMapping;
+ previewRenderer.toneMappingExposure=1.15;
+ previewRenderer.shadowMap.enabled=true;
+ previewRenderer.setClearColor(0x000000,0);
+ host.appendChild(previewRenderer.domElement);
+
+ previewScene=new THREE.Scene();
+ previewCamera=new THREE.PerspectiveCamera(35,1,.05,30);
+ previewCamera.position.set(0,1.30,-4.15);
+ previewCamera.lookAt(0,1.05,0);
+
+ const hemiP=new THREE.HemisphereLight(0xf4f0df,0x252b34,2.0);
+ previewScene.add(hemiP);
+ const keyP=new THREE.DirectionalLight(0xffe5b4,3.3);
+ keyP.position.set(-3,5,-4);keyP.castShadow=true;previewScene.add(keyP);
+ const rimP=new THREE.DirectionalLight(0x8aa9ff,1.6);
+ rimP.position.set(3,3,3);previewScene.add(rimP);
+
+ const floor=new THREE.Mesh(
+  new THREE.CircleGeometry(1.25,32),
+  new THREE.MeshStandardMaterial({color:0x171a20,roughness:1,transparent:true,opacity:.55})
+ );
+ floor.rotation.x=-Math.PI/2;
+ floor.position.y=-.39;
+ floor.receiveShadow=true;
+ previewScene.add(floor);
+
+ const group=makeKnight();
+ group.position.y=.40;
+ previewScene.add(group);
+ previewAvatar={
+  group,
+  pos:new THREE.Vector3(0,.40,0),
+  yaw:0,
+  skin:"",
+  weapon:"",
+  weaponMesh:null,
+  shieldMesh:null,
+  shieldVisible:false,
+  moveAmount:0,
+  walkPhase:0,
+  idlePhase:1.7,
+  lastVisualX:0,
+  lastVisualZ:0
+ };
+}
+
+function resizePreview3D(){
+ if(!previewRenderer)return;
+ const host=document.getElementById("preview3D");
+ if(!host)return;
+ const w=Math.max(10,host.clientWidth),h=Math.max(10,host.clientHeight);
+ const cw=previewRenderer.domElement.width/(previewRenderer.getPixelRatio?.()||1);
+ const ch=previewRenderer.domElement.height/(previewRenderer.getPixelRatio?.()||1);
+ if(Math.abs(cw-w)>2||Math.abs(ch-h)>2){
+  previewRenderer.setSize(w,h,false);
+  previewCamera.aspect=w/h;
+  previewCamera.updateProjectionMatrix();
+ }
+}
+
 function updateLoadoutPreview(){
  if(!me)return;
- const skin=SKINS[me.skin]||SKINS.crimson;
+ ensurePreview3D();
+
  const name=document.getElementById("previewName");
- const torso=document.getElementById("previewTorso");
- const weapon=document.getElementById("previewWeapon");
  const weaponNameEl=document.getElementById("previewWeaponName");
  const coins=document.getElementById("previewCoins");
  const ammo=document.getElementById("previewAmmo");
- const shield=document.getElementById("previewShield");
  const enemy=document.getElementById("previewEnemy");
 
  if(name)name.textContent=me.name||"Cavaliere";
- if(torso)torso.parentElement?.style.setProperty("--skin",skin.css);
- if(weapon){
-  weapon.textContent=WEAPON_PREVIEW_ICONS[me.weapon]||"⚔";
-  weapon.dataset.weapon=me.weapon||"sword";
-  weapon.style.fontSize=me.weapon==="chainsaw"?"82px":(me.weapon==="mud"?"62px":"76px");
-  weapon.style.transform=me.weapon==="bow"?"rotate(8deg)":"rotate(-18deg)";
- }
  if(weaponNameEl)weaponNameEl.textContent=weaponName(me);
  if(coins)coins.textContent=`🪙 ${me.coins}`;
  if(ammo)ammo.textContent=me.weapon==="bow"?`➶ ${me.ammo}`:"";
- if(shield)shield.classList.toggle("show",!!me.shieldEquipped);
+
+ if(previewAvatar){
+  if(previewAvatar.skin!==me.skin)applyRemoteSkin(previewAvatar,me.skin);
+  syncRemoteEquipment(previewAvatar,me);
+ }
 
  const enemies=othersFromState();
  if(enemy){
   if(!enemies.length)enemy.textContent="Avversario: in attesa";
   else enemy.innerHTML=enemies.map(p=>`<b>${p.name}</b><br>${weaponName(p)}${p.shieldEquipped?" + 🛡":""}`).join("<hr>");
  }
+}
+
+function renderPreview3D(dt){
+ if(!previewRenderer||!previewAvatar||!lobby.classList.contains("show"))return;
+ resizePreview3D();
+
+ // Idle elegante: respira e ruota molto leggermente, così si vedono anche fianco e mantello.
+ const tt=performance.now()*.001;
+ previewAvatar.group.rotation.y=Math.sin(tt*.42)*.28;
+ const fake={
+  yaw:previewAvatar.group.rotation.y,
+  pitch:0,
+  blocking:false
+ };
+ animateRemoteKnight(previewAvatar,fake,dt);
+ previewRenderer.render(previewScene,previewCamera);
 }
 
 function renderMapButtons(){
@@ -2422,6 +2661,27 @@ socket.on("chainsawRecharge",d=>{
  showMessage(`Motosega in ricarica: ${Math.ceil((d?.ms||0)/1000)}s`,1100);
 });
 
+socket.on("dodgeFX",d=>{
+ if(!d)return;
+ if(d.id===myId){
+  dodgePendingUntil=0;
+  dodgeState={
+   fromX:local.x,fromZ:local.z,
+   toX:Number(d.x),toZ:Number(d.z),
+   dir:Number(d.dir)<0?-1:1,
+   start:performance.now(),
+   duration:Math.max(120,Number(d.duration)||160)
+  };
+  local.blocking=false;
+ }else{
+  const avatar=remoteAvatars.get(d.id);
+  if(avatar){
+   avatar.dodgeFx=.20;
+   avatar.dodgeDir=Number(d.dir)<0?-1:1;
+  }
+ }
+});
+
 document.querySelectorAll("[data-private-format]").forEach(b=>b.addEventListener("click",()=>socket.emit("createRoom",{name:document.getElementById("createName").value,format:b.dataset.privateFormat})));
 document.getElementById("joinBtn").addEventListener("click",()=>socket.emit("joinRoom",{name:document.getElementById("joinName").value,code:document.getElementById("joinCode").value}));
 document.querySelectorAll("[data-bot]").forEach(b=>b.addEventListener("click",()=>socket.emit("createBotRoom",{name:document.getElementById("botName").value,difficulty:b.dataset.bot})));
@@ -2465,10 +2725,29 @@ document.addEventListener("fullscreenchange",()=>{
 
 document.addEventListener("pointerlockchange",()=>{locked=document.pointerLockElement===renderer.domElement});
 document.addEventListener("mousemove",e=>{if(controlMode!=="pc"||!locked||!playing)return;local.yaw-=e.movementX*.00225;local.pitch=Math.max(-1.15,Math.min(1.15,local.pitch-e.movementY*.0019))});
+function requestDodge(dir){
+ if(!playing||state?.phase!=="active"||!me||me.hp<=0||local.blocking||!local.onGround||dodgeState)return;
+ if((me.stamina||0)<24){showMessage("Stamina insufficiente per schivare",700);return}
+ dodgePendingUntil=performance.now()+240;
+ socket.emit("dodge",{dir});
+}
+
 document.addEventListener("keydown",e=>{
  if(controlMode!=="pc")return;
  keys[e.code]=true;
- if(e.code==="Space"){e.preventDefault();if(playing&&state?.phase==="active"&&local.onGround&&!local.blocking){local.vy=6.35;local.onGround=false}}
+
+ if(!e.repeat&&(e.code==="KeyA"||e.code==="KeyD")){
+  const now=performance.now();
+  const prev=lastDodgeTap[e.code]||0;
+  if(now-prev<265){
+   requestDodge(e.code==="KeyA"?-1:1);
+   lastDodgeTap[e.code]=0;
+  }else{
+   lastDodgeTap[e.code]=now;
+  }
+ }
+
+ if(e.code==="Space"){e.preventDefault();if(playing&&state?.phase==="active"&&local.onGround&&!local.blocking&&!dodgeState){local.vy=6.35;local.onGround=false}}
  if(e.code==="KeyI"&&!inventory.classList.contains("show"))openInventory();
  if(e.code==="Escape"&&inventory.classList.contains("show"))closeInventory()
 });
@@ -2606,6 +2885,23 @@ function updateLocal(dt){
  if(me.hp<=0){local.blocking=false;return}
  if(state?.phase!=="active"){local.blocking=false;local.y=0;local.vy=0;local.onGround=true;return}
  if(!local.onGround||local.vy>0){local.vy-=16.8*dt;local.y+=local.vy*dt;if(local.y<=0){local.y=0;local.vy=0;local.onGround=true}}
+
+ if(dodgeState){
+  const now=performance.now();
+  const p=Math.min(1,(now-dodgeState.start)/dodgeState.duration);
+  // ease-out molto rapido: scatto secco all'inizio, morbido alla fine.
+  const e=1-Math.pow(1-p,3);
+  local.x=dodgeState.fromX+(dodgeState.toX-dodgeState.fromX)*e;
+  local.z=dodgeState.fromZ+(dodgeState.toZ-dodgeState.fromZ)*e;
+  dodgeCameraRoll=-dodgeState.dir*Math.sin(Math.PI*p)*.075;
+  if(p>=1){
+   local.x=dodgeState.toX;local.z=dodgeState.toZ;
+   dodgeState=null;
+   dodgeCameraRoll=0;
+  }
+  return;
+ }
+
  let forward=0,side=0;
  if(controlMode==="mobile"){
   forward=mobileMove.forward;side=mobileMove.side;
@@ -2622,7 +2918,7 @@ function updateLocal(dt){
  }
 }
 let poseTimer=0;
-function sendPose(dt){poseTimer-=dt;if(poseTimer>0)return;poseTimer=.045;socket.emit("pose",{x:local.x,y:local.y,z:local.z,yaw:local.yaw,pitch:local.pitch,blocking:local.blocking})}
+function sendPose(dt){if(dodgeState||performance.now()<dodgePendingUntil)return;poseTimer-=dt;if(poseTimer>0)return;poseTimer=.045;socket.emit("pose",{x:local.x,y:local.y,z:local.z,yaw:local.yaw,pitch:local.pitch,blocking:local.blocking})}
 function lerpEuler(obj,target,amount){
  obj.rotation.x+= (target.x-obj.rotation.x)*amount;
  obj.rotation.y+= (target.y-obj.rotation.y)*amount;
@@ -2820,10 +3116,18 @@ function animateRemoteKnight(avatar,p,dt){
  // Leggera inclinazione naturale durante la corsa.
  rig.torso.rotation.x+=((move*.035)-rig.torso.rotation.x)*Math.min(1,dt*7);
  rig.torso.rotation.z+=((c*.018*move)-rig.torso.rotation.z)*Math.min(1,dt*7);
+
+ // Scatto laterale visibile anche sugli altri giocatori.
+ if((avatar.dodgeFx||0)>0){
+  avatar.dodgeFx=Math.max(0,avatar.dodgeFx-dt);
+  const k=Math.sin((avatar.dodgeFx/.20)*Math.PI);
+  rig.torso.rotation.z+=-(avatar.dodgeDir||1)*.28*k;
+  rig.headPivot.rotation.z+=-(avatar.dodgeDir||1)*.10*k;
+ }
 }
 
 function updateVisuals(dt){
- camera.position.set(local.x,1.68+local.y,local.z);camera.rotation.y=local.yaw;camera.rotation.x=local.pitch;
+ camera.position.set(local.x,1.68+local.y,local.z);camera.rotation.y=local.yaw;camera.rotation.x=local.pitch;camera.rotation.z+=(dodgeCameraRoll-camera.rotation.z)*Math.min(1,dt*18);
  const moving=controlMode==="mobile"?(Math.abs(mobileMove.forward)+Math.abs(mobileMove.side)>.08):(keys.KeyW||keys.KeyA||keys.KeyS||keys.KeyD);
  vm.position.y=(moving&&local.onGround)?Math.sin(performance.now()*.012)*.012:0;
  animateWeapons(dt);setEquipment();
@@ -2866,7 +3170,7 @@ function updateVisuals(dt){
  for(const [id,m] of arrowMeshes)if(!ids.has(id)){scene.remove(m);arrowMeshes.delete(id)}
  if(hitFlash>0){hitFlash-=dt;if(hitFlash<=0)ui.damage.style.opacity="0"}
 }
-function loop(t){const dt=Math.min(.033,(t-last)/1000||0);last=t;updateLocal(dt);sendPose(dt);updateVisuals(dt);renderer.render(scene,camera);requestAnimationFrame(loop)}
+function loop(t){const dt=Math.min(.033,(t-last)/1000||0);last=t;updateLocal(dt);sendPose(dt);updateVisuals(dt);renderer.render(scene,camera);renderPreview3D(dt);requestAnimationFrame(loop)}
 buildArena("keep");requestAnimationFrame(loop);
 </script>
 </body>
