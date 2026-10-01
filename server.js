@@ -200,7 +200,7 @@ function createPlayer(id, name, room, index) {
     owned: freshOwnedWeapons(),
     shieldOwned: false, shieldEquipped: false, blocking: false,
     ammo: 0, coins: 220, score: 0, ready: false,
-    attackAt: 0, lastMoveAt: Date.now(), skin: "crimson",
+    attackAt: 0, dodgeAt: 0, lastMoveAt: Date.now(), skin: "crimson",
     chainsawActiveUntil: 0, chainsawRechargeUntil: 0, chainsawNextHitAt: 0,
     blindedUntil: 0,
     team: teamForIndex(room, index),
@@ -231,6 +231,7 @@ function resetHumanLoadoutAfterMatch(p) {
   p.shieldEquipped = false;
   p.ammo = 0;
   p.blocking = false;
+  p.dodgeAt = 0;
   p.chainsawActiveUntil = 0;
   p.chainsawRechargeUntil = 0;
   p.chainsawNextHitAt = 0;
@@ -285,7 +286,7 @@ function resetRound(room) {
     const s = spawnForIndex(room, i);
     p.x = s.x; p.y = 0; p.z = s.z; p.yaw = s.yaw; p.pitch = 0;
     p.hp = 100; p.stamina = 100; p.blocking = false;
-    p.attackAt = 0; p.lastMoveAt = Date.now();
+    p.attackAt = 0; p.dodgeAt = 0; p.lastMoveAt = Date.now();
     p.chainsawActiveUntil = 0; p.chainsawRechargeUntil = 0; p.chainsawNextHitAt = 0; p.blindedUntil = 0;
     if (p.weapon === "bow" && p.ammo < 6) p.ammo = 6;
     if (p.isBot && p.bot) {
@@ -773,6 +774,47 @@ io.on("connection", socket => {
     if (!p || !p.shieldOwned || p.weapon === "bow" || p.weapon === "chainsaw") return;
     p.shieldEquipped = !p.shieldEquipped;
     if (!p.shieldEquipped) p.blocking = false;
+    emitRoom(room);
+  });
+
+  socket.on("dodge", data => {
+    const room = getRoom(socket); if (!room || room.phase !== "active") return;
+    const p = room.players.get(socket.id);
+    if (!p || p.isBot || p.hp <= 0 || p.blocking) return;
+
+    const dir = Number(data?.dir) < 0 ? -1 : 1;
+    const now = Date.now();
+    const DODGE_COOLDOWN = 720;
+    const DODGE_STAMINA = 24;
+    const DODGE_DISTANCE = 2.65;
+
+    if (now - (p.dodgeAt || 0) < DODGE_COOLDOWN) return;
+    if (p.stamina < DODGE_STAMINA) return;
+
+    p.dodgeAt = now;
+    p.stamina = Math.max(0, p.stamina - DODGE_STAMINA);
+    p.blocking = false;
+
+    // Vettore destro relativo alla direzione dello sguardo.
+    const rx = Math.cos(p.yaw);
+    const rz = -Math.sin(p.yaw);
+
+    let nx = p.x + rx * dir * DODGE_DISTANCE;
+    let nz = p.z + rz * dir * DODGE_DISTANCE;
+    let resolved = resolveMapCollision(room, nx, nz);
+    resolved = resolvePlayerCollision(room, p, resolved.x, resolved.z);
+
+    p.x = resolved.x;
+    p.z = resolved.z;
+    p.lastMoveAt = now;
+
+    io.to(room.code).emit("dodgeFX", {
+      id: p.id,
+      dir,
+      x: p.x,
+      z: p.z,
+      duration: 160
+    });
     emitRoom(room);
   });
 
